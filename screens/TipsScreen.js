@@ -4,9 +4,9 @@ import { ExpoConfigView } from '@expo/samples';
 
 import Colors from '../constants/Colors'
 
-export default class MeScreen extends React.Component {
+export default class TipsScreen extends React.Component {
   static navigationOptions = {
-    title: 'Me',
+    title: 'Tips',
     headerTintColor: Colors.tintColor
     //header: null,
   };

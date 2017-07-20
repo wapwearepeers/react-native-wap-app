@@ -3,7 +3,7 @@ import React from 'react';
 import { StackNavigator } from 'react-navigation';
 
 import MainTabNavigator from './MainTabNavigator';
-import MeScreen from '../screens/MeScreen';
+import TipsScreen from '../screens/TipsScreen';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 
 const RootStackNavigator = StackNavigator(
@@ -12,7 +12,7 @@ const RootStackNavigator = StackNavigator(
       screen: MainTabNavigator,
     },
     Detail: {
-      screen: MeScreen,
+      screen: TipsScreen,
     },
   },
   {

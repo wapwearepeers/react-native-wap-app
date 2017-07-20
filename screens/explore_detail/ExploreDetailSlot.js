@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
+import { FontAwesome } from '@expo/vector-icons';
+import Colors from '../../constants/Colors';
 //import { ExploreParticipantCount } from './ExploreParticipantCount';
 
 const maxParticipantCount = 6
@@ -13,14 +15,27 @@ export class ExploreDetailSlot extends Component {
   }
 
   render() {
-    const {name, title} = this.props
+    // <Image source={{uri: 'http://i.pravatar.cc/50'}} style={styles.image} />
+    const {name, topic, isOwner, phone} = this.props
     return (
       <View style={styles.containerMain}>
-        <Image source={{uri: 'http://i.pravatar.cc/50'}} style={styles.image} />
+        <View style={styles.image}>
+          <FontAwesome
+            name={'user'}
+            size={24}
+            color={Colors.tintColor}
+          />
+        </View>
         <View style={styles.container}>
           <AccentText fontSize={'medium'} style={styles.textTitle}>{name}</AccentText>
-          <SoftText fontSize={'small'} style={styles.textDescription}>{title}</SoftText>
+          <SoftText fontSize={'small'} style={styles.textDescription}>{topic}</SoftText>
         </View>
+        <FontAwesome
+          style={styles.iconPhone}
+          name={isOwner ? 'phone' : 'pencil-square-o'}
+          size={24}
+          color={Colors.tintColor}
+        />
       </View>
     );
   }
@@ -36,13 +51,22 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     width: '100%',
-    padding: padding/2
+    padding: padding/2,
+    alignItems: 'center',
   },
   image: {
     width: participantSize,
     height: participantSize,
     borderRadius: participantSize/2,
+    borderWidth: 1,
+    borderColor: Colors.tintColor,
     marginRight: padding,
+    //backgroundColor: Colors.darkerWhite,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconPhone: {
+    marginLeft: padding,
   },
   textTitle: {
 

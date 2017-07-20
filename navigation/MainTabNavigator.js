@@ -12,7 +12,7 @@ import ExploreNavigation from './ExploreNavigation';
 
 import ExploreScreen from '../screens/ExploreScreen';
 import CreateScreen from '../screens/CreateScreen';
-import MeScreen from '../screens/MeScreen';
+import TipsScreen from '../screens/TipsScreen';
 
 export default TabNavigator(
   {
@@ -23,7 +23,7 @@ export default TabNavigator(
       screen: CreateScreen,
     },
     Me: {
-      screen: MeScreen,
+      screen: TipsScreen,
     },
   },
   {

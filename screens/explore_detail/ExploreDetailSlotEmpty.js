@@ -1,4 +1,4 @@
-
+  
 import React, { Component } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
@@ -16,7 +16,6 @@ export class ExploreDetailSlotEmpty extends Component {
 
   render() {
     const focused = false
-    const iconName = 'pencil-square-o'
     return (
       <View style={styles.containerMain}>
         <View style={styles.image} />
@@ -26,7 +25,7 @@ export class ExploreDetailSlotEmpty extends Component {
         </View>
         <FontAwesome
           style={styles.iconEdit}
-          name={iconName}
+          name={'pencil-square-o'}
           size={24}
           color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
         />

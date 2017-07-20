@@ -1,6 +1,9 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import Colors from '../constants/Colors';
+
+const padding = 16
+const paddingHalf = 8
 
 const fontSizeMap = {
   micro: 12,
@@ -20,7 +23,7 @@ export class MonoText extends React.Component {
   }
 }
 
-export class AccentText extends React.Component {
+export class CustomText extends React.Component {
   render() {
     const fontSizeKey = this.props.fontSize ? this.props.fontSize : 'medium'
     return (
@@ -28,8 +31,39 @@ export class AccentText extends React.Component {
         {...this.props}
         style={[{
           fontFamily: 'raleway-medium',
-          color: Colors.accentText,
           fontSize: fontSizeMap[fontSizeKey],
+        }, this.props.style]}
+      />
+    );
+  }
+}
+
+export class CustomTextInput extends React.Component {
+  render() {
+    const fontSizeKey = this.props.fontSize ? this.props.fontSize : 'medium'
+    return (
+      <TextInput
+        {...this.props}
+        style={[{
+          fontFamily: 'raleway-medium',
+          fontSize: fontSizeMap[fontSizeKey],
+          paddingLeft: padding,
+          paddingRight: padding,
+          paddingTop: paddingHalf,
+          paddingBottom: paddingHalf,
+        }, this.props.style]}
+      />
+    );
+  }
+}
+
+export class AccentText extends React.Component {
+  render() {
+    return (
+      <CustomText
+        {...this.props}
+        style={[{
+          color: Colors.accentText,
         }, this.props.style]}
       />
     );
@@ -38,14 +72,12 @@ export class AccentText extends React.Component {
 
 export class SoftText extends React.Component {
   render() {
-    const fontSizeKey = this.props.fontSize ? this.props.fontSize : 'medium'
     return (
-      <Text
+      <CustomText
         {...this.props}
         style={[{
           fontFamily: 'raleway-semi-bold',
           color: Colors.softText,
-          fontSize: fontSizeMap[fontSizeKey],
         }, this.props.style]}
       />
     );

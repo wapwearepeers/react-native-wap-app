@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
 import { ExploreDetailSlot } from './ExploreDetailSlot';
 import { ExploreDetailSlotEmpty } from './ExploreDetailSlotEmpty';
@@ -9,10 +9,25 @@ const maxParticipantCount = 6
 
 export class ExploreDetailSlotManager extends Component {
 
+  constructor(props) {
+    super(props)
+  }
+
+  _onPressSlot(participant, i) {
+    this.props.onPressSlot(participant, i)
+  }
+
+  _onPressSlotEmpty(index) {
+    this.props.onPressSlot(null, -1)
+  }
+
   _buildSlotList() {
-      return this.props.participants.map((parcipant) => {
+      return this.props.participants.map((participant, i) => {
+        const {id, name, topic, isOwner, phone} = participant
         return (
-          <ExploreDetailSlot key={parcipant.id} name={parcipant.name} title={parcipant.title} />
+          <TouchableOpacity key={id} onPress={this._onPressSlot.bind(this, participant, i)} style={styles.containerSlot}>
+            <ExploreDetailSlot name={name} topic={topic} isOwner={isOwner} phone={phone} />
+          </TouchableOpacity>
         )
       })
   }
@@ -20,7 +35,11 @@ export class ExploreDetailSlotManager extends Component {
   _buildSlotEmptyList() {
     const slotEmptyList = []
     for (i = this.props.participants.length; i < maxParticipantCount; i++)
-      slotEmptyList.push(<ExploreDetailSlotEmpty index={i+1} key={`empty_${i}`}/>)
+      slotEmptyList.push(
+        <TouchableOpacity key={`empty_${i}`} onPress={this._onPressSlotEmpty.bind(this, i)} style={styles.containerSlot}>
+          <ExploreDetailSlotEmpty index={i+1} />
+        </TouchableOpacity>
+      )
     return slotEmptyList
   }
 
@@ -38,8 +57,13 @@ const participantSize = 50
 const padding = 16
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: padding/2
+    //flex: 1,
+    width:'100%',
+    padding: padding/2,
+  },
+  containerSlot: {
+    //flex:1,
+    width:'100%',
   },
   textTitle: {
 
