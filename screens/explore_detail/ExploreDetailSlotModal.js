@@ -49,7 +49,7 @@ export class ExploreDetailSlotModal extends Component {
               </View>
               <View style={styles.container}>
                 <TextInput
-                  style={styles.textInput}
+                  style={Styles.textInput}
                   value={this.state.name}
                   placeholder={'Type your name'}
                   returnKeyType={"next"}
@@ -60,7 +60,7 @@ export class ExploreDetailSlotModal extends Component {
                 />
                 <TextInput
                   ref={'descriptionInput'}
-                  style={styles.textInput}
+                  style={Styles.textInput}
                   value={this.state.topic}
                   placeholder={'Type the title of your sharing'}
                   onChangeText={(topic) => this.setState({topic})}

@@ -7,7 +7,7 @@ import Colors from '../constants/Colors'
 export default class TipsScreen extends React.Component {
   static navigationOptions = {
     title: 'Tips',
-    headerTintColor: Colors.tintColor
+    headerTintColor: "#000",
     //header: null,
   };
 

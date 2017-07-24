@@ -19,7 +19,7 @@ import { ExploreDetailSlotModal } from './explore_detail/ExploreDetailSlotModal'
 export default class ExploreDetailScreen extends React.Component {
   static navigationOptions = {
     title: 'WAP',
-    headerTintColor: Colors.tintColor,
+    headerTintColor: "#000",
     //header: null,
   }
 

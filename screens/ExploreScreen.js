@@ -16,7 +16,7 @@ import { ExploreSectionListView } from './explore/ExploreSectionListView';
 export default class ExploreScreen extends React.Component {
   static navigationOptions = {
     title: 'Explore',
-    headerTintColor: Colors.tintColor,
+    headerTintColor: "#000",
     //header: null,
   }
 

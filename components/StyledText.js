@@ -83,3 +83,16 @@ export class SoftText extends React.Component {
     );
   }
 }
+
+export class SoftThinText extends React.Component {
+  render() {
+    return (
+      <CustomText
+        {...this.props}
+        style={[{
+          color: Colors.softText,
+        }, this.props.style]}
+      />
+    );
+  }
+}
