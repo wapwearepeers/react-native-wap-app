@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Image, Text, Button, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import Modal from 'react-native-modal'
 
-import { CustomTextInput } from '../../components/StyledText';
+import { CustomText } from '../../components/StyledText';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '../../constants/Colors';
 import Styles from '../../App.style';
 //import { ExploreParticipantCount } from './ExploreParticipantCount';
 
-export class CreateThemeModal extends Component {
+export class CreateInfoModal extends Component {
 
   constructor(props) {
     super(props);
@@ -44,44 +44,23 @@ export class CreateThemeModal extends Component {
   render() {
     const focused = false
     return (
-      <KeyboardAvoidingView behavior={'position'}>
         <Modal isVisible={this.state.modalVisible}>
           <View style={Styles.modalContent}>
-            <View style={styles.containerMain}>
-              <View style={styles.container}>
-                <TextInput
-                  ref="input"
-                  autoFocus={true}
-                  style={Styles.textInput}
-                  value={this.state.theme}
-                  placeholder={'Type here'}
-                  onChangeText={(theme) => this.setState({theme})}
-                  onSubmitEditing={(event) => { this._onPressValidate() }}
-                  autoCapitalize={'sentences'}
-                />
-              </View>
+            <View style={styles.container}>
+            <CustomText style={styles.paddingHalf} fontSize="medium">{this.props.title}</CustomText>
+            <CustomText style={styles.paddingHalf} fontSize="small">{this.props.description}</CustomText>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={styles.container}>
               <Button
                 style={styles.button}
                 onPress={() => {this.setModalVisible(false)} }
-                title="Cancel"
+                title="OK"
                 color={Colors.tintColor}
-                accessibilityLabel="Click here to Cancel"
-              />
-
-              <Button
-                style={styles.button}
-                disabled={!this._canValidate()}
-                onPress={() => { this._onPressValidate() }}
-                title="Submit"
-                color={Colors.tintColor}
-                accessibilityLabel="Click here to create a new Theme"
+                accessibilityLabel="Click here to dismiss this window"
               />
             </View>
           </View>
         </Modal>
-      </KeyboardAvoidingView>
     );
   }
 }
@@ -95,12 +74,11 @@ const participantSize = 50
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-  },
-  containerMain: {
-    flexDirection: 'row',
-    width: '100%',
-    padding: padding / 2,
     alignItems: 'center',
+    padding: paddingHalf,
+  },
+  paddingHalf: {
+    padding: paddingHalf
   },
   button: {
     flex:1,

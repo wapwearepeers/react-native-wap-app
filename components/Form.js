@@ -108,7 +108,8 @@ export class FormChooser extends Component {
   }
 
   _onPressChooser() {
-    this.props.onPressChooser()
+    if (this.props.onPressChooser)
+      this.props.onPressChooser()
     const chooser = this.props.chooser
     if (chooser) {
       chooser.onSelectValue = this._onSelectValue.bind(this)
@@ -172,6 +173,11 @@ export class FormTextInputHashtags extends Component {
       }
     })
     this.setState({value})
+    if (this.props.onChangeValue)
+      this.props.onChangeValue(value)
+
+    if (this.props.onChangeHashtags)
+      this.props.onChangeHashtags(Array.from(new Set(tags)))
   }
 
   _onBlur() {
