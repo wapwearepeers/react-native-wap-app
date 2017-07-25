@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Colors from '../constants/Colors';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
@@ -80,11 +81,11 @@ export default class CreateScreen extends React.Component {
     return (
       <View style={styles.container}>
         <CreateThemeModal
-          ref={'modal'}
+          ref="modal"
           onPressValidate={this._onPressValidateCreateTheme.bind(this)}
           currentThemes={this.state.chooserOptionsTheme}
           />
-        <ScrollView>
+        <KeyboardAwareScrollView>
           <FormTextInput
             title="Your name"
             nextFocus={this.refs.inputPhone}
@@ -155,7 +156,7 @@ export default class CreateScreen extends React.Component {
               color={Colors.tintColor}
               accessibilityLabel="Click here to create a WAP"
             />
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <ChooserText ref={chooser => !this.state.chooser && this.setState({chooser})} />
       </View>
 

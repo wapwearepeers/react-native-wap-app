@@ -19,6 +19,7 @@
     "react-native-custom-action-sheet": "0.0.11",
     "react-native-forms": "^1.0.1",
     "react-native-infinite-scroll-view": "^0.4.3",
+    "react-native-keyboard-aware-scroll-view": "^0.2.9",
     "react-native-modal": "^2.4.0",
     "react-navigation": "^1.0.0-beta.11",
     "react-prop-types": "^0.4.0"

@@ -149,11 +149,38 @@ export class FormChooser extends Component {
 export class FormTextInputHashtags extends Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {value:null}
   }
 
   focus() {
     this.refs.textInput.focus()
+  }
+
+  getHashtags() {
+    return this.state.value.replace(" ", "").split("#")
+  }
+
+  _onChangeText(text) {
+    var tags = text.split(" ")
+    var value = ""
+    tags.forEach((tag, i) => {
+      tag = tag.replace(/[^\w\s]/gi, '')
+      if (tag && tag !== "") {
+        value += "#" + tag
+        if (i < tags.length-1)
+          value += " "
+      }
+    })
+    this.setState({value})
+  }
+
+  _onBlur() {
+    var value = this.state.value.trim()
+    var last = value.length-1
+    if (value[last] == '#') {
+      value = value.slice(0, -1).trim()
+    }
+    this.setState({value})
   }
 
   render() {
@@ -161,6 +188,13 @@ export class FormTextInputHashtags extends Component {
       <FormTextInput
         ref="textInput"
         {...this.props}
+        inputProps={{
+          ...this.props.inputProps,
+          value: this.state.value,
+          onChangeText: this._onChangeText.bind(this),
+          onBlur: this._onBlur.bind(this),
+          keyboardType: "email-address"
+        }}
         />
     );
   }
