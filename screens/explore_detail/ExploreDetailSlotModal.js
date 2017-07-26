@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Image, TextInput, Button, KeyboardAvoidingView } from 'react-native';
 import Modal from 'react-native-modal'
 
 import { CustomTextInput } from '../../components/StyledText';
@@ -30,7 +30,8 @@ export class ExploreDetailSlotModal extends Component {
   }
 
   _canValidate() {
-    return true
+    const {name, topic} = this.state
+    return name && topic && name != '' && topic != ''
   }
 
   render() {
@@ -76,12 +77,22 @@ export class ExploreDetailSlotModal extends Component {
               />
             </View>
             <View style={{flexDirection: 'row'}}>
-              <TouchableOpacity style={[Styles.button, styles.button]} onPress={ () => {this.setModalVisible(false)} }>
-                <Text>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[Styles.button, styles.button]} disabled={!this._canValidate()} onPress={() => { this._onPressValidate() }}>
-                <Text>Validate</Text>
-              </TouchableOpacity>
+              <Button
+                style={styles.button}
+                onPress={() => {this.setModalVisible(false)} }
+                title="Cancel"
+                color={Colors.tintColor}
+                accessibilityLabel="Click here to Cancel"
+              />
+
+              <Button
+                style={styles.button}
+                disabled={!this._canValidate()}
+                onPress={() => { this._onPressValidate() }}
+                title="Submit"
+                color={Colors.tintColor}
+                accessibilityLabel="Click here to create a new Theme"
+              />
             </View>
           </View>
         </Modal>

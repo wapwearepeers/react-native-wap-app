@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Picker, Image, StyleSheet } from 'react-native';
+import { View, Picker, Image, StyleSheet, Dimensions } from 'react-native';
 import { NavigationActions } from 'react-navigation'
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import { AccentText } from '../components/StyledText'
 
@@ -15,7 +16,9 @@ export default class SelectCommunityScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      communities: ['WAP emlyon', 'WAP GRDF', 'WAP SNCF', 'WAP ALdes', 'WAP sanofi']
+    }
   }
 
   _goToApp(community) {
@@ -30,29 +33,38 @@ export default class SelectCommunityScreen extends React.Component {
     this.props.navigation.dispatch(actionToDispatch)
   }
 
+  _onSelectCommunity(index, community) {
+    this.setState({community}, () => console.log("community: "+community))
+    this._navigateTo("RootNavigation")
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Image style={styles.imageLogo} source={require('../assets/images/wap-logo.png')}/>
         <AccentText style={styles.textTagLine} fontSize="small">Meet and share your knowledge</AccentText>
-        <Picker style={{width:'100%'}}
-          selectedValue={this.state.language}
-          onValueChange={(language, index) => this.setState({language})}>
-          <Item label="Java" value="java" />
-          <Item label="JavaScript" value="js" />
-        </Picker>
+        <ModalDropdown
+          style={ {width:"100%"} }
+          dropdownStyle={styles.dropdownStyle}
+          textStyle={styles.textStyle}
+          dropdownTextStyle={styles.dropdownTextStyle}
+          options={this.state.communities}
+          defaultValue="Choose your community ▼"
+          onSelect={ this._onSelectCommunity.bind(this) }
+        />
       </View>
     );
   }
 }
 
+const padding = 16
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding
   },
   imageLogo: {
     //height: 72,
@@ -61,5 +73,16 @@ const styles = StyleSheet.create({
   },
   textTagLine: {
     marginBottom: 66,
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontSize: 16
+  },
+  dropdownTextStyle: {
+    fontSize: 14,
+  },
+  dropdownStyle: {
+    width: Dimensions.get('window').width - padding*2,
+    //padding,
   }
 });
