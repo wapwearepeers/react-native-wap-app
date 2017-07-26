@@ -9,10 +9,9 @@ import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 
 import ExploreNavigation from './ExploreNavigation';
+import TipsNavigation from './TipsNavigation';
 
-import ExploreScreen from '../screens/ExploreScreen';
 import CreateScreen from '../screens/CreateScreen';
-import TipsScreen from '../screens/TipsScreen';
 
 export default TabNavigator(
   {
@@ -23,7 +22,7 @@ export default TabNavigator(
       screen: CreateScreen,
     },
     Me: {
-      screen: TipsScreen,
+      screen: TipsNavigation,
     },
   },
   {
@@ -40,7 +39,7 @@ export default TabNavigator(
             iconName = 'plus';
             break;
           case 'Me':
-            iconName = 'user-circle-o';
+            iconName = 'lightbulb-o';
         }
         return (
           <FontAwesome

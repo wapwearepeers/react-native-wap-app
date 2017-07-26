@@ -22,14 +22,14 @@ export class BaseForm extends Component {
     return (
       <View style={styles.containerMain}>
         <View style={styles.container}>
-          <SoftText fontSize={'medium'} style={styles.textTitle}>{this.props.title}</SoftText>
+          <SoftText fontSize="medium" style={styles.textTitle}>{this.props.title}</SoftText>
             { this.props.formContent }
       </View>
       { this.props.onPressInfo &&
         <TouchableOpacity onPress={this.props.onPressInfo}>
           <FontAwesome
             style={styles.iconEdit}
-            name={'info-circle'}
+            name="info-circle"
             size={24}
             color={Colors.tintColor}
             />
@@ -61,7 +61,7 @@ export class FormTextInput extends Component {
             returnKeyType="next"
             autoFocus={false}
             onSubmitEditing={(event) => { if (this.props.nextFocus) this.props.nextFocus.focus(); }}
-            autoCapitalize={'sentences'}
+            autoCapitalize="sentences"
             {...this.props.inputProps}
           />
         }
@@ -86,7 +86,7 @@ export class FormTextDescription extends Component {
     return (
       <BaseForm
         formContent={
-          <SoftThinText fontSize={'small'} style={Styles.textInput}>{this.props.description}</SoftThinText>
+          <SoftThinText fontSize="small" style={Styles.textInput}>{this.props.description}</SoftThinText>
         }
         {...this.props}
       />
@@ -137,7 +137,7 @@ export class FormChooser extends Component {
         <BaseForm
           formContent={
             <TouchableOpacity onPress={this._onPressChooser.bind(this)}>
-              <AccentText fontSize={'small'} style={Styles.textInput}>{this.state.value ? this.state.value : this.props.description}</AccentText>
+              <AccentText fontSize="small" style={Styles.textInput}>{this.state.value ? this.state.value : this.props.description}</AccentText>
             </TouchableOpacity>
           }
           {...this.props}
@@ -181,11 +181,15 @@ export class FormTextInputHashtags extends Component {
   }
 
   _onBlur() {
-    var value = this.state.value.trim()
-    var last = value.length-1
-    if (value[last] == '#') {
-      value = value.slice(0, -1).trim()
+    var value = null
+    if (this.state.value) {
+      value = this.state.value.trim()
+      var last = value.length-1
+      if (value[last] == '#') {
+        value = value.slice(0, -1).trim()
+      }
     }
+
     this.setState({value})
   }
 

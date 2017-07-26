@@ -5,16 +5,16 @@ import Colors from '../constants/Colors'
 
 import MainTabNavigator from './MainTabNavigator';
 
-import ExploreScreen from '../screens/ExploreScreen';
-import ExploreDetailScreen from '../screens/ExploreDetailScreen';
+import TipsScreen from '../screens/TipsScreen';
+import TipsDetailScreen from '../screens/TipsDetailScreen';
 
-const ExploreStackNavigator = StackNavigator(
+const TipsStackNavigator = StackNavigator(
   {
     Main: {
-      screen: ExploreScreen,
+      screen: TipsScreen,
     },
     Detail: {
-      screen: ExploreDetailScreen,
+      screen: TipsDetailScreen,
     },
   },
   {
@@ -26,14 +26,14 @@ const ExploreStackNavigator = StackNavigator(
   }
 );
 
-export default class ExploreNavigation extends React.Component {
+export default class TipsNavigation extends React.Component {
   static navigationOptions = {
-    title: 'Explore',
+    title: 'Tips',
     header: null,
     headerTintColor: Colors.tintColor,
   }
 
   render() {
-    return <ExploreStackNavigator />;
+    return <TipsStackNavigator />;
   }
 }
