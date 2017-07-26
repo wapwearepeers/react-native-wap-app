@@ -3,6 +3,7 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading } from 'expo';
 import { FontAwesome } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
+import FirstLaunchNavigation from './navigation/FirstLaunchNavigation';
 
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
@@ -44,7 +45,11 @@ export default class AppContainer extends React.Component {
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           {Platform.OS === 'android' &&
             <View style={styles.statusBarUnderlay} />}
-          <RootNavigation />
+          {true ? (
+            <FirstLaunchNavigation />
+          ) : (
+            <RootNavigation />
+          )}
         </View>
       );
     } else {
