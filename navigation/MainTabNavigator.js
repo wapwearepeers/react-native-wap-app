@@ -21,7 +21,7 @@ export default TabNavigator(
     Create: {
       screen: CreateScreen,
     },
-    Me: {
+    Tips: {
       screen: TipsNavigation,
     },
   },
@@ -38,7 +38,7 @@ export default TabNavigator(
           case 'Create':
             iconName = 'plus';
             break;
-          case 'Me':
+          case 'Tips':
             iconName = 'lightbulb-o';
         }
         return (
