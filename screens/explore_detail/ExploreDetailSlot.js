@@ -16,7 +16,7 @@ export class ExploreDetailSlot extends Component {
 
   render() {
     // <Image source={{uri: 'http://i.pravatar.cc/50'}} style={styles.image} />
-    const {name, topic, isOwner, phone} = this.props
+    const {name, topic, isOrganizer, phone} = this.props
     return (
       <View style={styles.containerMain}>
         <View style={styles.image}>
@@ -32,7 +32,7 @@ export class ExploreDetailSlot extends Component {
         </View>
         <FontAwesome
           style={styles.iconPhone}
-          name={isOwner ? 'phone' : 'pencil-square-o'}
+          name={isOrganizer ? 'phone' : 'pencil-square-o'}
           size={24}
           color={Colors.tintColor}
         />

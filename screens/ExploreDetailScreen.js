@@ -14,7 +14,9 @@ import Styles from '../App.style';
 import { AccentText, SoftText } from '../components/StyledText';
 import { ExploreDetailSlotManager } from './explore_detail/ExploreDetailSlotManager';
 import { ExploreDetailSlotModal } from './explore_detail/ExploreDetailSlotModal';
+import FirebaseApp from '../firebase.config.js';
 
+const idCommunity = 1
 
 export default class ExploreDetailScreen extends React.Component {
   static navigationOptions = {
@@ -25,15 +27,30 @@ export default class ExploreDetailScreen extends React.Component {
 
   constructor(props) {
     super(props)
+    const {state} = this.props.navigation;
+    const {wap} = state.params;
+    const {key, tags, theme, place, date, participants} = wap
+    var description = tags ? tags.join(" ") : " "
     this.state = {
       modalVisible: false,
-      participants: [
-        { id:0, name:'Diane Lenne', topic:'Design like a Finnish', isOwner:true, phone:'+33612345678' },
-        { id:1, name:'Gabriel Morin', topic:'UX Design for kids' }
-      ],
+      tags, theme, place, date, participants
     };
     this.editedParticipant = null
     this.editedParticipantIndex = -1
+    this.wapRef = FirebaseApp.database().ref("waps/"+idCommunity+"/"+key)
+    this.participantsRef = FirebaseApp.database().ref("waps/"+idCommunity+"/"+key+"/participants")
+  }
+
+  componentDidMount() {
+    this._listenForWap(this.wapRef);
+  }
+
+  _listenForWap(wapRef) {
+    wapRef.on('value', snap => {
+      console.log("snap:"+JSON.stringify(snap))
+      const {key, tags, theme, place, date, participants} = snap.val()
+      this.setState({tags, theme, place, date, participants});
+    });
   }
 
   _setModalVisible(visible) {
@@ -42,9 +59,9 @@ export default class ExploreDetailScreen extends React.Component {
 
   _addParticipant(name, topic) {
     const { participants } = this.state
-    const id = participants.length
-    participants.push({ id, name, topic })
+    participants.push({name, topic})
     this.setState({participants})
+    this.participantsRef.set(participants)
   }
 
   _updateParticipant(name, topic, i) {
@@ -52,11 +69,12 @@ export default class ExploreDetailScreen extends React.Component {
     participants[i].name = name
     participants[i].topic = topic
     this.setState({participants})
+    this.participantsRef.set(participants)
   }
 
   _onPressSlot(participant, i) {
     //console.log(`_onPressSlot -> name: ${participant.name} | topic: ${participant.topic} | i: ${i}`)
-    if (participant && participant.isOwner) {
+    if (participant && participant.isOrganizer) {
       Communications.phonecall(participant.phone, true)
 
     } else {
@@ -87,23 +105,19 @@ export default class ExploreDetailScreen extends React.Component {
   }
 
   render() {
-    const {state} = this.props.navigation;
-    const {wap} = state.params;
-    var description = ""
-    wap.tags.forEach(tag => {
-      description += `#${tag} \n`
-    })
+    const {tags, theme, date, place} = this.state
+    var description = (tags ? tags.join(" ") : " ") + "\n"
     return (
       <ScrollView>
         <View style={styles.container}>
           <ExploreDetailSlotModal ref={'modal'} onPressValidate={this._onPressValidate.bind(this)}/>
           <View style={styles.containerWithPadding}>
             <View style={styles.containerTitle}>
-              <AccentText fontSize={'mediumBig'} style={styles.textTitle}>{wap.title}</AccentText>
+              <AccentText fontSize={'mediumBig'} style={styles.textTitle}>{theme}</AccentText>
               <SoftText fontSize={'small'} style={styles.textDescription}>{description}</SoftText>
             </View>
-            <AccentText fontSize={'medium'} style={styles.textTitle}>Thursday May 5, 14:00</AccentText>
-            <AccentText fontSize={'medium'} style={styles.textTitle}>Maker's Lab</AccentText>
+            <AccentText fontSize={'medium'} style={styles.textTitle}>{date}</AccentText>
+            <AccentText fontSize={'medium'} style={styles.textTitle}>{place}</AccentText>
           </View>
           <ExploreDetailSlotManager
             style={{width:'100%'}}

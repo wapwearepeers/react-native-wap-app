@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
+import { Platform, View, Text, Button, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Colors from '../constants/Colors';
@@ -7,6 +7,10 @@ import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser 
 import { ChooserText } from '../components/Chooser';
 import { CreateThemeModal } from './create/CreateThemeModal';
 import { CreateInfoModal } from './create/CreateInfoModal';
+import Firebase from 'firebase'
+import FirebaseApp from '../firebase.config.js';
+
+const idCommunity = "1"
 
 export default class CreateScreen extends React.Component {
   static navigationOptions = {
@@ -19,10 +23,39 @@ export default class CreateScreen extends React.Component {
     super(props)
     this.state = {
       name: '',
-      time: 'Thursday, May 5 14:00',
-      chooserOptionsTheme: ["Innovation & Design", "Arts & Culture", "Better Work", "Human Relationship", "Digital & Tech", "How-To", "Future of Society", "Share Anything"],
-      chooserOptionsPlace: ["Maker's Lab", "Cafeteria", "Learning Hub"],
+      date: 'Thursday, May 5 14:00',
+      chooserOptionThemes: [],
+      chooserOptionPlaces: [],
+      isLoadingThemes: true,
+      isLoadingPlaces: true,
     }
+    const db = FirebaseApp.database()
+    this.themesRef = db.ref("themes/"+idCommunity)
+    this.placesRef = db.ref("places/"+idCommunity)
+    this.wapsRef = db.ref("waps/"+idCommunity)
+  }
+
+  componentDidMount() {
+    this.listenForThemes(this.themesRef);
+    this.listenForPlaces(this.placesRef);
+  }
+
+  listenForThemes(themesRef) {
+    themesRef.on('value', snap => {
+      console.log("snap: " + JSON.stringify(snap.val()))
+      var chooserOptionThemes = snap.val()
+      this.setState({chooserOptionThemes, isLoadingThemes: false});
+    });
+  }
+
+  listenForPlaces(placesRef) {
+    placesRef.on('value', snap => {
+      var chooserOptionPlaces = snap.val()
+      const newTheme = this.newTheme
+      if (newTheme && !chooserOptionPlaces.includes(newTheme))
+        chooserOptionPlaces.push(newTheme)
+      this.setState({chooserOptionPlaces, isLoadingPlaces: false});
+    });
   }
 
   _onChangeTextName(name) {
@@ -75,10 +108,6 @@ After gathering, your group have the freedom to choose the place to start your W
     )
   }
 
-  _onPressValidate() {
-
-  }
-
   _onSelectValueTheme(theme, index) {
     this.setState({theme})
   }
@@ -92,10 +121,15 @@ After gathering, your group have the freedom to choose the place to start your W
   }
 
   _onPressValidateCreateTheme(theme) {
-    const chooserOptionsTheme = []
-    this.state.chooserOptionsTheme.forEach(o => chooserOptionsTheme.push(o))
-    chooserOptionsTheme.push(theme)
-    this.setState({chooserOptionsTheme})
+    const chooserOptionThemes = []
+    if (this.state.chooserOptionThemes)
+      this.state.chooserOptionThemes.forEach(o => {
+        if (o !== this.newTheme)
+          chooserOptionThemes.push(o)
+      })
+    chooserOptionThemes.push(theme)
+    this.newTheme = theme
+    this.setState({chooserOptionThemes})
     this.formChooserTheme.setState({value: theme})
   }
 
@@ -105,95 +139,137 @@ After gathering, your group have the freedom to choose the place to start your W
     })
   }
 
-  render() {
+  _onPressValidateCreateWap() {
+    if (this.newTheme) 
+      this.themesRef.set(this.state.chooserOptionThemes)
+    var newWapRef = this.wapsRef.push()
+    const {name, phone, theme, tags, topic, date, place} = this.state
+    newWapRef.set({
+      theme,
+      tags,
+      topic,
+      date,
+      timestamp: Firebase.database.ServerValue.TIMESTAMP,
+      place,
+      participants:[{name, phone, topic, isOrganizer:true}]
+    })
+  }
+
+  getContainerFromPlatform(content) {
+    //if (Platform.OS === 'ios') {
+      return (
+        <KeyboardAwareScrollView>
+          {content}
+        </KeyboardAwareScrollView>
+      )
+    //}
+
+    // return (
+    //   <ScrollView>
+    //     <KeyboardAvoidingView behavior="padding">
+    //       {content}
+    //     </KeyboardAvoidingView>
+    //   </ScrollView>
+    // )
+  }
+
+  getContent() {
     const placeholder = 'Type here'
+    return (
+      <View>
+        <FormTextInput
+          title="Your name"
+          nextFocus={this.refs.inputPhone}
+          inputProps={{
+            placeholder,
+            value: this.state.name,
+            onChangeText: this._onChangeTextName.bind(this),
+          }}
+        />
+        <FormTextInput
+          ref="inputPhone"
+          nextFocus={this.refs.inputTags}
+          title="Your phone number"
+          inputProps={{
+            placeholder,
+            value: this.state.phone,
+            onChangeText: this._onChangeTextPhone.bind(this),
+            keyboardType: "phone-pad",
+          }}
+          />
+        <FormChooser
+          ref={f => this.formChooserTheme = f}
+          title="Theme"
+          description="Choose a theme"
+          onPressInfo={this._onPressInfoTheme.bind(this)}
+          onSelectValue={this._onSelectValueTheme.bind(this)}
+          onPressCreate={this._onPressCreateTheme.bind(this)}
+          chooser={this.state.chooser}
+          chooseTitle="Choose a WAP theme"
+          chooserOptions={this.state.chooserOptionThemes}
+          chooserCreateTitle="Create a new theme"
+          isLoading={this.state.isLoadingThemes}
+          />
+        <FormTextInputHashtags
+          ref="inputTags"
+          nextFocus={this.refs.inputTopic}
+          title="Describe your theme by 1-2 tags"
+          onChangeHashtags={(tags => this.setState({tags}))}
+          onChangeValue={(tagsToString => this.setState({tagsToString}))}
+          inputProps={{
+            placeholder: "Use space to separate"
+          }}
+          />
+        <FormTextInput
+          title="Title of your sharing"
+          ref="inputTopic"
+          onPressInfo={this._onPressInfoTopic.bind(this)}
+          inputProps={{
+            placeholder,
+            value: this.state.topic,
+            onChangeText: this._onChangeTextTopic.bind(this),
+          }}
+          />
+        <FormTextDescription
+          title="Time"
+          description={this.state.date}
+          onPressInfo={this._onPressInfoTime.bind(this)}
+          />
+        <FormChooser
+          title="Place"
+          description="Choose a place"
+          onPressInfo={this._onPressInfoPlace.bind(this)}
+          onSelectValue={this._onSelectValuePlace.bind(this)}
+          chooser={this.state.chooser}
+          chooseTitle="Choose a place"
+          chooserOptions={this.state.chooserOptionPlaces}
+          isLoading={this.state.isLoadingPlaces}
+          />
+        {false && <Text>{this.state.name} | {this.state.phone} | {this.state.theme} | {this.state.topic} | {this.state.tags}</Text>}
+        <Button
+          onPress={this._onPressValidateCreateWap.bind(this)}
+          title="Create this WAP"
+          color={Colors.tintColor}
+          accessibilityLabel="Click here to create a WAP"
+        />
+      </View>
+    )
+  }
+
+  render() {
     return (
       <View style={styles.container}>
         <CreateThemeModal
           ref="modalTheme"
           onPressValidate={this._onPressValidateCreateTheme.bind(this)}
-          currentThemes={this.state.chooserOptionsTheme}
+          currentThemes={this.state.chooserOptionThemes}
           />
         <CreateInfoModal
           ref="modalInfo"
           title={this.state.modalInfoTitle}
           description={this.state.modalInfoDescription}
           />
-        <KeyboardAwareScrollView>
-          <FormTextInput
-            title="Your name"
-            nextFocus={this.refs.inputPhone}
-            inputProps={{
-              placeholder,
-              value: this.state.name,
-              onChangeText: this._onChangeTextName.bind(this),
-            }}
-            />
-            <FormTextInput
-              ref="inputPhone"
-              nextFocus={this.refs.inputTags}
-              title="Your phone number"
-              inputProps={{
-                placeholder,
-                value: this.state.phone,
-                onChangeText: this._onChangeTextPhone.bind(this),
-                keyboardType: "phone-pad",
-              }}
-              />
-            <FormChooser
-              ref={f => this.formChooserTheme = f}
-              title="Theme"
-              description="Choose a theme"
-              onPressInfo={this._onPressInfoTheme.bind(this)}
-              onSelectValue={this._onSelectValueTheme.bind(this)}
-              onPressCreate={this._onPressCreateTheme.bind(this)}
-              chooser={this.state.chooser}
-              chooseTitle="Choose a WAP theme"
-              chooserOptions={this.state.chooserOptionsTheme}
-              chooserCreateTitle="Create a new theme"
-              />
-            <FormTextInputHashtags
-              ref="inputTags"
-              nextFocus={this.refs.inputTopic}
-              title="Describe your theme by 1-2 tags"
-              onChangeHashtags={(tags => this.setState({tags}))}
-              onChangeValue={(tagsToString => this.setState({tagsToString}))}
-              inputProps={{
-                placeholder: "Use space to separate"
-              }}
-              />
-            <FormTextInput
-              title="Title of your sharing"
-              ref="inputTopic"
-              onPressInfo={this._onPressInfoTopic.bind(this)}
-              inputProps={{
-                placeholder,
-                value: this.state.topic,
-                onChangeText: this._onChangeTextTopic.bind(this),
-              }}
-              />
-            <FormTextDescription
-              title="Time"
-              description={this.state.time}
-              onPressInfo={this._onPressInfoTime.bind(this)}
-              />
-            <FormChooser
-              title="Place"
-              description="Choose a place"
-              onPressInfo={this._onPressInfoPlace.bind(this)}
-              onSelectValue={this._onSelectValuePlace.bind(this)}
-              chooser={this.state.chooser}
-              chooseTitle="Choose a place"
-              chooserOptions={this.state.chooserOptionsPlace}
-              />
-            {false && <Text>{this.state.name} | {this.state.phone} | {this.state.theme} | {this.state.topic} | {this.state.tags}</Text>}
-            <Button
-              onPress={this._onPressValidate.bind(this)}
-              title="Create this WAP"
-              color={Colors.tintColor}
-              accessibilityLabel="Click here to create a WAP"
-            />
-        </KeyboardAwareScrollView>
+        {this.getContainerFromPlatform(this.getContent())}
         <ChooserText ref={chooser => !this.state.chooser && this.setState({chooser})} />
       </View>
 

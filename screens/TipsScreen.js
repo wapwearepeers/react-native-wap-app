@@ -116,32 +116,39 @@ I can ask an open question, let the group proposes its ideas and solutions.`
   render() {
     return (
       <View style={styles.container}>
-        <Button
-          onPress={this._onPressWhatIsWap.bind(this)}
-          title="What is WAP?"
-          color={Colors.tintColor}
-          accessibilityLabel="What is WAP?"
-        />
-        <Button
-          onPress={this._onPressRules.bind(this)}
-          title="What are the game rules?"
-          color={Colors.tintColor}
-          accessibilityLabel="What are the game rules?"
-        />
-        <Button
-          onPress={this._onPressWhatToShare.bind(this)}
-          title="What to share?"
-          color={Colors.tintColor}
-          accessibilityLabel="What to share?"
-        />
-        <Button
-          onPress={this._onPressHowToShare.bind(this)}
-          title="How to share?"
-          color={Colors.tintColor}
-          accessibilityLabel="How to share?"
-        />
+        <View style={styles.buttonWrapper}>
+          <Button
+            onPress={this._onPressWhatIsWap.bind(this)}
+            title="What is WAP?"
+            color={Colors.tintColor}
+            accessibilityLabel="What is WAP?"
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            onPress={this._onPressRules.bind(this)}
+            title="What are the game rules?"
+            color={Colors.tintColor}
+            accessibilityLabel="What are the game rules?"
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            onPress={this._onPressWhatToShare.bind(this)}
+            title="What to share?"
+            color={Colors.tintColor}
+            accessibilityLabel="What to share?"
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            onPress={this._onPressHowToShare.bind(this)}
+            title="How to share?"
+            color={Colors.tintColor}
+            accessibilityLabel="How to share?"
+          />
+        </View>
         {/*<ExpoConfigView />*/}
-
       </View>
     );
   }
@@ -155,4 +162,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  buttonWrapper: {
+    width:'100%',
+    margin:8
+  }
 });

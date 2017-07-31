@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Keyboard, StyleSheet, View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { AccentText, SoftText, SoftThinText } from './StyledText';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
@@ -20,21 +20,27 @@ export class BaseForm extends Component {
 
   render() {
     return (
-      <View style={styles.containerMain}>
-        <View style={styles.container}>
-          <SoftText fontSize="medium" style={styles.textTitle}>{this.props.title}</SoftText>
-            { this.props.formContent }
-      </View>
-      { this.props.onPressInfo &&
-        <TouchableOpacity onPress={this.props.onPressInfo}>
-          <FontAwesome
-            style={styles.iconEdit}
-            name="info-circle"
-            size={24}
-            color={Colors.tintColor}
-            />
-        </TouchableOpacity>
-      }
+      <View>
+        {this.props.isLoading ? (
+          <ActivityIndicator />
+        ):(
+          <View style={styles.containerMain}>
+            <View style={styles.container}>
+              <SoftText fontSize="medium" style={styles.textTitle}>{this.props.title}</SoftText>
+                { this.props.formContent }
+              </View>
+            { this.props.onPressInfo &&
+              <TouchableOpacity onPress={this.props.onPressInfo}>
+                <FontAwesome
+                  style={styles.iconEdit}
+                  name="info-circle"
+                  size={24}
+                  color={Colors.tintColor}
+                  />
+              </TouchableOpacity>
+            }
+          </View>
+        )}
       </View>
     );
   }
@@ -60,7 +66,12 @@ export class FormTextInput extends Component {
             ref="textInput"
             returnKeyType="next"
             autoFocus={false}
-            onSubmitEditing={(event) => { if (this.props.nextFocus) this.props.nextFocus.focus(); }}
+            onSubmitEditing={(event) => {
+              if (this.props.nextFocus)
+                this.props.nextFocus.focus();
+              else
+                Keyboard.dismiss()
+            }}
             autoCapitalize="sentences"
             {...this.props.inputProps}
           />

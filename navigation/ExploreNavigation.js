@@ -7,6 +7,7 @@ import MainTabNavigator from './MainTabNavigator';
 
 import ExploreScreen from '../screens/ExploreScreen';
 import ExploreDetailScreen from '../screens/ExploreDetailScreen';
+import CreateScreen from '../screens/CreateScreen';
 
 const ExploreStackNavigator = StackNavigator(
   {
@@ -15,6 +16,9 @@ const ExploreStackNavigator = StackNavigator(
     },
     Detail: {
       screen: ExploreDetailScreen,
+    },
+    Create: {
+      screen: CreateScreen,
     },
   },
   {

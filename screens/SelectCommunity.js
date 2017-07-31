@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Picker, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Picker, Image, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import ModalDropdown from 'react-native-modal-dropdown';
+import FirebaseApp from '../firebase.config.js';
 
 import { AccentText } from '../components/StyledText'
 
@@ -16,9 +17,25 @@ export default class SelectCommunityScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      communities: ['WAP emlyon', 'WAP GRDF', 'WAP SNCF', 'WAP ALdes', 'WAP sanofi']
-    }
+    this.itemsRef = FirebaseApp.database().ref("communities")
+    this.state = { communities: [], isLoading: true }
+    //   communities: ['WAP emlyon', 'WAP GRDF', 'WAP SNCF', 'WAP ALdes', 'WAP sanofi']
+    // }
+  }
+
+  componentDidMount() {
+    console.log("componentDidMount -> _queryCommunities")
+    this._queryCommunities(this.itemsRef)
+  }
+
+  _queryCommunities(itemsRef) {
+    itemsRef.once('value').then(snap => {
+      var snapArray = snap.val()
+      console.log(JSON.stringify(snapArray))
+      var communities = snapArray.map(x => x.name)
+      var isLoading = false
+      this.setState({communities, isLoading})
+    });
   }
 
   _goToApp(community) {
@@ -43,15 +60,19 @@ export default class SelectCommunityScreen extends React.Component {
       <View style={styles.container}>
         <Image style={styles.imageLogo} source={require('../assets/images/wap-logo.png')}/>
         <AccentText style={styles.textTagLine} fontSize="small">Meet and share your knowledge</AccentText>
-        <ModalDropdown
-          style={ {width:"100%"} }
-          dropdownStyle={styles.dropdownStyle}
-          textStyle={styles.textStyle}
-          dropdownTextStyle={styles.dropdownTextStyle}
-          options={this.state.communities}
-          defaultValue="Choose your community ▼"
-          onSelect={ this._onSelectCommunity.bind(this) }
-        />
+        {this.state.isLoading ? (
+          <ActivityIndicator />
+        ):(
+          <ModalDropdown
+            style={ {width:"100%"} }
+            dropdownStyle={styles.dropdownStyle}
+            textStyle={styles.textStyle}
+            dropdownTextStyle={styles.dropdownTextStyle}
+            options={this.state.communities}
+            defaultValue="Choose your community ▼"
+            onSelect={ this._onSelectCommunity.bind(this) }
+          />
+        )}
       </View>
     );
   }

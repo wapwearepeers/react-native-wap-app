@@ -45,7 +45,7 @@ export default class AppContainer extends React.Component {
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           {Platform.OS === 'android' &&
             <View style={styles.statusBarUnderlay} />}
-          {true ? (
+          {false ? (
             <FirstLaunchNavigation />
           ) : (
             <RootNavigation />

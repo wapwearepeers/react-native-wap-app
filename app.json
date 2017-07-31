@@ -21,7 +21,11 @@
       "assetExts": ["ttf"]
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wearetheprojects.wap"
+    },
+    "android": {
+      "package": "com.wearetheprojects.wap"
     }
   }
 }

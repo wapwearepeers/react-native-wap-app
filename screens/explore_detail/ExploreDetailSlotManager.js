@@ -23,10 +23,10 @@ export class ExploreDetailSlotManager extends Component {
 
   _buildSlotList() {
       return this.props.participants.map((participant, i) => {
-        const {id, name, topic, isOwner, phone} = participant
+        const {name, topic, isOrganizer, phone} = participant
         return (
-          <TouchableOpacity key={id} onPress={this._onPressSlot.bind(this, participant, i)} style={styles.containerSlot}>
-            <ExploreDetailSlot name={name} topic={topic} isOwner={isOwner} phone={phone} />
+          <TouchableOpacity key={"participant_"+i} onPress={this._onPressSlot.bind(this, participant, i)} style={styles.containerSlot}>
+            <ExploreDetailSlot name={name} topic={topic} isOrganizer={isOrganizer} phone={phone} />
           </TouchableOpacity>
         )
       })

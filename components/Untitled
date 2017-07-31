@@ -1,0 +1,22 @@
+{
+  "EMLyon": {
+    "5 may": [
+      {"title":"Innovation & Design", "tags":["informationredundance", "educationchange"], "participantCount":5, "joined":true},
+      {"title":"Art & Culture", "tags":["digitalnomadlifestyle", "creativewriting"], "participantCount":2, "joined":true},
+      {"title":"Human Relationship", "tags":["hackbrainreality", "growthmindset"], "participantCount":4, "joined":false},
+      {"title":"Better Work", "tags":["relearntolearn", "sellinnovativeservices"], "participantCount":6, "joined":false}
+    ],
+    "12 may": [
+      {"title":"Pre-WAP", "tags":["innovationanddesign"], "participantCount":6, "joined":false},
+      {"title":"How To", "tags":["organiccooking", "findyourspontaneity"], "participantCount":6, "joined":true},
+      {"title":"Human Relationship", "tags":["hackbrainreality", "growthmindset"], "participantCount":4, "joined":false},
+      {"title":"Better Work", "tags":["relearntolearn", "sellinnovativeservices"], "participantCount":6, "joined":false}
+    ],
+    "17 may": [
+      {"title":"Innovation & Design", "tags":["informationredundance", "educationchange"], "participantCount":5, "joined":true},
+      {"title":"Art & Culture", "tags":["digitalnomadlifestyle", "creativewriting"], "participantCount":2, "joined":true},
+      {"title":"Human Relationship", "tags":["hackbrainreality", "growthmindset"], "participantCount":4, "joined":false},
+      {"title":"Better Work", "tags":["relearntolearn", "sellinnovativeservices"], "participantCount":6, "joined":false}
+    ]
+  }
+}

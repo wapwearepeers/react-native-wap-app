@@ -29,13 +29,11 @@ export default StyleSheet.create({
   bottomModal: {
     justifyContent: 'flex-end',
     margin: 0,
-  },textInput: {
-    height: 40,
+  },
+  textInput: {
+    //height: 40,
     fontFamily: 'raleway-medium',
     fontSize: 16,
-    paddingLeft: padding,
-    paddingRight: padding,
-    paddingTop: paddingHalf,
-    paddingBottom: paddingHalf,
+    padding,
   },
 });

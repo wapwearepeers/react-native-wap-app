@@ -9,6 +9,12 @@ import Colors from '../../constants/Colors';
 import Styles from '../../App.style';
 //import { ExploreParticipantCount } from './ExploreParticipantCount';
 
+const padding = 16
+const paddingHalf = 8
+const paddingBottomText = 4
+const countSize = 32
+const participantSize = 50
+
 export class CreateThemeModal extends Component {
 
   constructor(props) {
@@ -29,8 +35,8 @@ export class CreateThemeModal extends Component {
 
   _onPressValidate() {
     var themes = this.props.currentThemes
-    var theme = this.state.theme
-    if (themes && !themes.includes(theme)) {
+    var theme = this.state.theme.trim()
+    if (themes == null || !themes.includes(theme)) {
       this.props.onPressValidate(theme)
       this.setState({theme: null})
       this.setModalVisible(false)
@@ -45,14 +51,20 @@ export class CreateThemeModal extends Component {
     const focused = false
     return (
       <KeyboardAvoidingView behavior={'position'}>
-        <Modal isVisible={this.state.modalVisible}>
+        <Modal isVisible={this.state.modalVisible}
+          onLayout={(event) => {
+            var {x, y, width, height} = event.nativeEvent.layout;
+            this.setState({
+              textInputWidth: (width - padding*3),
+            })
+          }}>
           <View style={Styles.modalContent}>
             <View style={styles.containerMain}>
               <View style={styles.container}>
                 <TextInput
                   ref="input"
                   autoFocus={true}
-                  style={Styles.textInput}
+                  style={[Styles.textInput, {width:this.state.textInputWidth}]}
                   value={this.state.theme}
                   placeholder={'Type here'}
                   onChangeText={(theme) => this.setState({theme})}
@@ -61,23 +73,24 @@ export class CreateThemeModal extends Component {
                 />
               </View>
             </View>
-            <View style={{flexDirection: 'row'}}>
-              <Button
-                style={styles.button}
-                onPress={() => {this.setModalVisible(false)} }
-                title="Cancel"
-                color={Colors.tintColor}
-                accessibilityLabel="Click here to Cancel"
-              />
-
-              <Button
-                style={styles.button}
-                disabled={!this._canValidate()}
-                onPress={() => { this._onPressValidate() }}
-                title="Submit"
-                color={Colors.tintColor}
-                accessibilityLabel="Click here to create a new Theme"
-              />
+            <View style={{flexDirection: 'row', marginTop:padding}}>
+              <View style={{flex:1}}>
+                <Button
+                  onPress={() => {this.setModalVisible(false)} }
+                  title="Cancel"
+                  color={Colors.tintColor}
+                  accessibilityLabel="Click here to Cancel"
+                />
+              </View>
+              <View style={{flex:1, marginLeft:padding}}>
+                <Button
+                  disabled={!this._canValidate()}
+                  onPress={() => { this._onPressValidate() }}
+                  title="Submit"
+                  color={Colors.tintColor}
+                  accessibilityLabel="Click here to create a new Theme"
+                />
+              </View>
             </View>
           </View>
         </Modal>
@@ -85,12 +98,6 @@ export class CreateThemeModal extends Component {
     );
   }
 }
-
-const padding = 16
-const paddingHalf = 8
-const paddingBottomText = 4
-const countSize = 32
-const participantSize = 50
 
 const styles = StyleSheet.create({
   container: {
@@ -102,7 +109,7 @@ const styles = StyleSheet.create({
     padding: padding / 2,
     alignItems: 'center',
   },
-  button: {
+  buttonWrapper: {
     flex:1,
   },
   image: {

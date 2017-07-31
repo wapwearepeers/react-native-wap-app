@@ -4,20 +4,48 @@ import {
   Platform,
   StyleSheet,
   Text,
-  //TouchableOpacity,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 // import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 
 import { ExploreSectionListView } from './explore/ExploreSectionListView';
+import firebaseApp from '../firebase.config.js';
+
+export const EventButton = (props) => {
+  let testButton = (
+  <TouchableOpacity onPress={() => props.navigation.navigate('Create', { name: 'Create'})}>
+    <FontAwesome
+      style={{margin:12}}
+      name={'plus'}
+      size={24}
+      color={Colors.tabIconSelected}
+    />
+  </TouchableOpacity>)
+  return testButton
+}
 
 export default class ExploreScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Explore',
-    headerTintColor: "#000",
-    //header: null,
+
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: 'Explore',
+      headerTintColor: "#000",
+      headerRight: (
+        <EventButton
+          navigation={navigation}
+        />
+      ),
+    };
+  };
+
+
+  constructor(props) {
+    super(props)
+    this.itemsRef = firebaseApp.database().ref()
   }
 
   render() {

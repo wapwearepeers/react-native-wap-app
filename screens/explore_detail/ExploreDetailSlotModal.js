@@ -9,6 +9,12 @@ import Colors from '../../constants/Colors';
 import Styles from '../../App.style';
 //import { ExploreParticipantCount } from './ExploreParticipantCount';
 
+const padding = 16
+const paddingHalf = 8
+const paddingBottomText = 4
+const countSize = 32
+const participantSize = 50
+
 export class ExploreDetailSlotModal extends Component {
 
   constructor(props) {
@@ -33,12 +39,18 @@ export class ExploreDetailSlotModal extends Component {
     const {name, topic} = this.state
     return name && topic && name != '' && topic != ''
   }
-
+  // value={this.state.name}
   render() {
     const focused = false
     return (
       <KeyboardAvoidingView behavior={'position'}>
-        <Modal isVisible={this.state.modalVisible}>
+        <Modal isVisible={this.state.modalVisible}
+          onLayout={(event) => {
+            var {x, y, width, height} = event.nativeEvent.layout;
+            this.setState({
+              textInputWidth: (width - participantSize - padding*4),
+            })
+          }}>
           <View style={Styles.modalContent}>
             <View style={styles.containerMain}>
               <View style={styles.image}>
@@ -50,7 +62,7 @@ export class ExploreDetailSlotModal extends Component {
               </View>
               <View style={styles.container}>
                 <TextInput
-                  style={Styles.textInput}
+                  style={[Styles.textInput, {width:this.state.textInputWidth}]}
                   value={this.state.name}
                   placeholder={'Type your name'}
                   returnKeyType={"next"}
@@ -61,7 +73,7 @@ export class ExploreDetailSlotModal extends Component {
                 />
                 <TextInput
                   ref={'descriptionInput'}
-                  style={Styles.textInput}
+                  style={[Styles.textInput, {width:this.state.textInputWidth, marginTop:padding}]}
                   value={this.state.topic}
                   placeholder={'Type the title of your sharing'}
                   onChangeText={(topic) => this.setState({topic})}
@@ -76,23 +88,24 @@ export class ExploreDetailSlotModal extends Component {
                 color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
               />
             </View>
-            <View style={{flexDirection: 'row'}}>
-              <Button
-                style={styles.button}
-                onPress={() => {this.setModalVisible(false)} }
-                title="Cancel"
-                color={Colors.tintColor}
-                accessibilityLabel="Click here to Cancel"
-              />
-
-              <Button
-                style={styles.button}
-                disabled={!this._canValidate()}
-                onPress={() => { this._onPressValidate() }}
-                title="Submit"
-                color={Colors.tintColor}
-                accessibilityLabel="Click here to create a new Theme"
-              />
+            <View style={{flexDirection: 'row', marginTop:padding}}>
+              <View style={{flex:1}}>
+                <Button
+                  onPress={() => {this.setModalVisible(false)} }
+                  title="Cancel"
+                  color={Colors.tintColor}
+                  accessibilityLabel="Click here to Cancel"
+                />
+              </View>
+              <View style={{flex:1, marginLeft:padding}}>
+                <Button
+                  disabled={!this._canValidate()}
+                  onPress={() => { this._onPressValidate() }}
+                  title="Submit"
+                  color={Colors.tintColor}
+                  accessibilityLabel="Click here to create a new Theme"
+                />
+              </View>
             </View>
           </View>
         </Modal>
@@ -100,12 +113,6 @@ export class ExploreDetailSlotModal extends Component {
     );
   }
 }
-
-const padding = 16
-const paddingHalf = 8
-const paddingBottomText = 4
-const countSize = 32
-const participantSize = 50
 
 const styles = StyleSheet.create({
   container: {
@@ -117,8 +124,11 @@ const styles = StyleSheet.create({
     padding: padding / 2,
     alignItems: 'center',
   },
-  button: {
-    flex:1,
+  containerButtons: {
+    width:'100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: padding,
   },
   image: {
     width: participantSize,
@@ -141,6 +151,7 @@ const styles = StyleSheet.create({
     paddingBottom: paddingBottomText,
   },
   textInput: {
+    flex:1,
     height: 40,
     fontFamily: 'raleway-medium',
     fontSize: 16,

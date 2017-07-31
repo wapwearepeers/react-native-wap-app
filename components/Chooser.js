@@ -22,7 +22,9 @@ export class ChooserText extends Component {
 
   setContent(title, optionsNoCancel, createTitle, callback) {
     const options =  ['Cancel']
-    optionsNoCancel.forEach(o => options.push(o))
+    if (optionsNoCancel)
+      optionsNoCancel.forEach(o => options.push(o))
+      
     var destructiveButtonIndex = -1
     if (createTitle) {
       options.push(createTitle)

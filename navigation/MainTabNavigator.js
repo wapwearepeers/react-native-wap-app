@@ -18,9 +18,9 @@ export default TabNavigator(
     Explore: {
       screen: ExploreNavigation,
     },
-    Create: {
-      screen: CreateScreen,
-    },
+    // Create: {
+    //   screen: CreateScreen,
+    // },
     Tips: {
       screen: TipsNavigation,
     },
