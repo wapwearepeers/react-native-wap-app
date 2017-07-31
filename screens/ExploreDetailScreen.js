@@ -48,8 +48,11 @@ export default class ExploreDetailScreen extends React.Component {
   _listenForWap(wapRef) {
     wapRef.on('value', snap => {
       console.log("snap:"+JSON.stringify(snap))
-      const {key, tags, theme, place, date, participants} = snap.val()
-      this.setState({tags, theme, place, date, participants});
+      var wap = snap.val()
+      if (wap) {
+        const {key, tags, theme, place, date, participants} = wap
+        this.setState({tags, theme, place, date, participants});
+      }
     });
   }
 

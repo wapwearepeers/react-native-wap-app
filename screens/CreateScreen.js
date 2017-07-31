@@ -129,7 +129,7 @@ After gathering, your group have the freedom to choose the place to start your W
       })
     chooserOptionThemes.push(theme)
     this.newTheme = theme
-    this.setState({chooserOptionThemes})
+    this.setState({chooserOptionThemes, theme})
     this.formChooserTheme.setState({value: theme})
   }
 
@@ -153,6 +153,7 @@ After gathering, your group have the freedom to choose the place to start your W
       place,
       participants:[{name, phone, topic, isOrganizer:true}]
     })
+    this.props.navigation.goBack()
   }
 
   getContainerFromPlatform(content) {
@@ -272,7 +273,6 @@ After gathering, your group have the freedom to choose the place to start your W
         {this.getContainerFromPlatform(this.getContent())}
         <ChooserText ref={chooser => !this.state.chooser && this.setState({chooser})} />
       </View>
-
     );
   }
 }
