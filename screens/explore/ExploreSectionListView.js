@@ -13,7 +13,7 @@ export class ExploreSectionListView extends Component {
 
   constructor(props) {
     super(props);
-    this.wapsRef = FirebaseApp.database().ref("waps/"+idCommunity).orderByChild('timestamp')
+    this.wapsRef = FirebaseApp.database().ref("waps/"+idCommunity).orderByChild('createdAt')
     const dataBlob = {
       // '5 may': [
       //   {title:'Innovation & Design', tags:['informationredundance', 'educationchange'], participantCount:5, joined:true},
@@ -62,30 +62,15 @@ export class ExploreSectionListView extends Component {
 
   listenForWaps(wapsRef) {
     wapsRef.on('value', snap => {
-      console.log("snap:"+JSON.stringify(snap))
-
-      // get children as an array
       var val = FirebaseUtils.snapshotToArray(snap)
-      console.log("val: "+JSON.stringify(val))
       var dataBlob = {}
       val.forEach(x => {
-        const key = x.date
+        const key = new Date(x.timestamp).toLocaleTimeString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', hour12:false})
         if (!dataBlob[key])
           dataBlob[key] = []
         dataBlob[key].push(x)
       })
       var dataSource = this.state.dataSource.cloneWithRowsAndSections(dataBlob)
-
-      //console.log("dataBlob: "+JSON.stringify(dataBlob))
-
-      // items.forEach((child) => {
-      //   console.log(JSON.stringify(child.val()))
-      //   //items.push({
-      //     //title: child.val().title,
-      //     //_key: child.key
-      //   //});
-      // });
-
       this.setState({dataBlob, dataSource, isLoading:false});
 
     });

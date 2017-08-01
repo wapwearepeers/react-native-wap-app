@@ -37,8 +37,8 @@ export default class ExploreDetailScreen extends React.Component {
     };
     this.editedParticipant = null
     this.editedParticipantIndex = -1
-    this.wapRef = FirebaseApp.database().ref("waps/"+idCommunity+"/"+key)
-    this.participantsRef = FirebaseApp.database().ref("waps/"+idCommunity+"/"+key+"/participants")
+    this.wapRef = FirebaseApp.database().ref(`waps/${idCommunity}/${key}`)
+    this.participantsRef = FirebaseApp.database().ref(`waps/${idCommunity}/${key}/participants`)
   }
 
   componentDidMount() {

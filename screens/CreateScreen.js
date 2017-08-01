@@ -9,6 +9,7 @@ import { CreateThemeModal } from './create/CreateThemeModal';
 import { CreateInfoModal } from './create/CreateInfoModal';
 import Firebase from 'firebase'
 import FirebaseApp from '../firebase.config.js';
+import * as FirebaseUtils from '../utilities/FirebaseUtils.js';
 
 const idCommunity = "1"
 
@@ -28,34 +29,81 @@ export default class CreateScreen extends React.Component {
       chooserOptionPlaces: [],
       isLoadingThemes: true,
       isLoadingPlaces: true,
+      isLoadingSchedule: true,
     }
     const db = FirebaseApp.database()
-    this.themesRef = db.ref("themes/"+idCommunity)
-    this.placesRef = db.ref("places/"+idCommunity)
-    this.wapsRef = db.ref("waps/"+idCommunity)
+    this.themesRef = db.ref(`themes/${idCommunity}`)
+    this.placesRef = db.ref(`places/${idCommunity}`)
+    this.wapsRef = db.ref(`waps/${idCommunity}`)
+    this.scheduleRef = db.ref(`communities/${idCommunity}/schedule/0`)
   }
 
   componentDidMount() {
     this.listenForThemes(this.themesRef);
     this.listenForPlaces(this.placesRef);
+    this.listenForWaps(this.wapsRef);
+    this.downloadSchedule(this.scheduleRef);
   }
 
-  listenForThemes(themesRef) {
-    themesRef.on('value', snap => {
-      console.log("snap: " + JSON.stringify(snap.val()))
+  listenForThemes(ref) {
+    ref.on('value', snap => {
+      //console.log("snap: " + JSON.stringify(snap.val()))
       var chooserOptionThemes = snap.val()
       this.setState({chooserOptionThemes, isLoadingThemes: false});
     });
   }
 
-  listenForPlaces(placesRef) {
-    placesRef.on('value', snap => {
+  listenForPlaces(ref) {
+    ref.on('value', snap => {
       var chooserOptionPlaces = snap.val()
       const newTheme = this.newTheme
       if (newTheme && !chooserOptionPlaces.includes(newTheme))
         chooserOptionPlaces.push(newTheme)
       this.setState({chooserOptionPlaces, isLoadingPlaces: false});
     });
+  }
+
+  listenForWaps(ref) {
+    ref.on('value', snap => {
+      var waps = FirebaseUtils.snapshotToArray(snap)
+      this.nextWeekThemes = []
+      this.forbiddenThemes = []
+      waps.forEach(wap => {
+        const {theme} = wap
+        if (this.nextWeekThemes.includes(theme))
+          this.forbiddenThemes.push(theme)
+        else
+          this.nextWeekThemes.push(theme)
+      })
+
+      console.log("waps: " + JSON.stringify(waps))
+      console.log("this.nextWeekThemes: " + JSON.stringify(this.nextWeekThemes))
+      console.log("this.forbiddenThemes: " + JSON.stringify(this.forbiddenThemes))
+    });
+  }
+
+  downloadSchedule(ref) {
+    ref.once('value', snap => {
+      this.schedule = snap.val()
+      this._setDateFromSchedule(this.schedule)
+    });
+  }
+
+  _setDateFromSchedule(schedule, addOneMoreWeek) {
+    var d = new Date();
+    var dif = schedule.day - d.getDay()
+    if (dif < 0)
+      dif = 7 + dif
+    var newDate = d.getDate()+dif
+    if (addOneMoreWeek) newDate += 7
+    d.setUTCDate(newDate)
+    d.setUTCHours(schedule.hour)
+    d.setUTCMinutes(schedule.min)
+    d.setUTCSeconds(0)
+    d.setUTCMilliseconds(0)
+    this.wapDate = d
+    var date = d.toLocaleTimeString("en-US", {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:false})
+    this.setState({date, isLoadingSchedule:false});
   }
 
   _onChangeTextName(name) {
@@ -109,7 +157,21 @@ After gathering, your group have the freedom to choose the place to start your W
   }
 
   _onSelectValueTheme(theme, index) {
-    this.setState({theme})
+    if (this.forbiddenThemes.includes(theme)) {
+      this.formChooserTheme.setState({value: null}, () => {
+        this.setState({theme:null}, () => {
+          this._showModal(
+            "Can't select this theme",
+            "They already are 2 WAP currently happening with this theme. Please join one of theme or select another theme."
+          )
+        })
+      })
+    } else {
+      if (this.nextWeekThemes.includes(theme)) {
+        this._setDateFromSchedule(this.schedule, true)
+      }
+      this.setState({theme})
+    }
   }
 
   _onSelectValuePlace(place, index) {
@@ -143,13 +205,13 @@ After gathering, your group have the freedom to choose the place to start your W
     if (this.newTheme) 
       this.themesRef.set(this.state.chooserOptionThemes)
     var newWapRef = this.wapsRef.push()
-    const {name, phone, theme, tags, topic, date, place} = this.state
+    const {name, phone, theme, tags, topic, place} = this.state
     newWapRef.set({
       theme,
       tags,
       topic,
-      date,
-      timestamp: Firebase.database.ServerValue.TIMESTAMP,
+      timestamp: this.wapDate.getTime(),
+      createdAt: Firebase.database.ServerValue.TIMESTAMP,
       place,
       participants:[{name, phone, topic, isOrganizer:true}]
     })
@@ -176,6 +238,8 @@ After gathering, your group have the freedom to choose the place to start your W
 
   getContent() {
     const placeholder = 'Type here'
+    const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces} = this.state
+    var isButtonEnabled = name && phone && theme && tags && topic && place && this.wapDate
     return (
       <View>
         <FormTextInput
@@ -183,7 +247,7 @@ After gathering, your group have the freedom to choose the place to start your W
           nextFocus={this.refs.inputPhone}
           inputProps={{
             placeholder,
-            value: this.state.name,
+            value: name,
             onChangeText: this._onChangeTextName.bind(this),
           }}
         />
@@ -193,7 +257,7 @@ After gathering, your group have the freedom to choose the place to start your W
           title="Your phone number"
           inputProps={{
             placeholder,
-            value: this.state.phone,
+            value: phone,
             onChangeText: this._onChangeTextPhone.bind(this),
             keyboardType: "phone-pad",
           }}
@@ -205,11 +269,11 @@ After gathering, your group have the freedom to choose the place to start your W
           onPressInfo={this._onPressInfoTheme.bind(this)}
           onSelectValue={this._onSelectValueTheme.bind(this)}
           onPressCreate={this._onPressCreateTheme.bind(this)}
-          chooser={this.state.chooser}
+          chooser={chooser}
           chooseTitle="Choose a WAP theme"
-          chooserOptions={this.state.chooserOptionThemes}
+          chooserOptions={chooserOptionThemes}
           chooserCreateTitle="Create a new theme"
-          isLoading={this.state.isLoadingThemes}
+          isLoading={isLoadingThemes}
           />
         <FormTextInputHashtags
           ref="inputTags"
@@ -227,31 +291,33 @@ After gathering, your group have the freedom to choose the place to start your W
           onPressInfo={this._onPressInfoTopic.bind(this)}
           inputProps={{
             placeholder,
-            value: this.state.topic,
+            value: topic,
             onChangeText: this._onChangeTextTopic.bind(this),
           }}
           />
         <FormTextDescription
           title="Time"
-          description={this.state.date}
+          description={date}
           onPressInfo={this._onPressInfoTime.bind(this)}
+          isLoading={isLoadingSchedule}
           />
         <FormChooser
           title="Place"
           description="Choose a place"
           onPressInfo={this._onPressInfoPlace.bind(this)}
           onSelectValue={this._onSelectValuePlace.bind(this)}
-          chooser={this.state.chooser}
+          chooser={chooser}
           chooseTitle="Choose a place"
-          chooserOptions={this.state.chooserOptionPlaces}
-          isLoading={this.state.isLoadingPlaces}
+          chooserOptions={chooserOptionPlaces}
+          isLoading={isLoadingPlaces}
           />
-        {false && <Text>{this.state.name} | {this.state.phone} | {this.state.theme} | {this.state.topic} | {this.state.tags}</Text>}
+        {/*false && <Text>{name} | {phone} | {theme} | {topic} | {tags}</Text>*/}
         <Button
           onPress={this._onPressValidateCreateWap.bind(this)}
           title="Create this WAP"
           color={Colors.tintColor}
           accessibilityLabel="Click here to create a WAP"
+          disabled={!isButtonEnabled}
         />
       </View>
     )
