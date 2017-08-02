@@ -3,6 +3,7 @@ import { Platform, View, Text, Button, ScrollView, StyleSheet, KeyboardAvoidingV
 import { ExpoLinksView } from '@expo/samples';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
+import Moment from 'moment'
 import Colors from '../constants/Colors';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
@@ -30,7 +31,7 @@ export default class CreateScreen extends React.Component {
     super(props)
     this.state = {
       name: '',
-      date: 'Thursday, May 5 14:00',
+      date: '',
       chooserOptionThemes: [],
       chooserOptionPlaces: [],
       isLoadingThemes: true,
@@ -108,10 +109,6 @@ export default class CreateScreen extends React.Component {
         else
           this.nextWeekThemes.push(theme)
       })
-
-      console.log("waps: " + JSON.stringify(waps))
-      console.log("this.nextWeekThemes: " + JSON.stringify(this.nextWeekThemes))
-      console.log("this.forbiddenThemes: " + JSON.stringify(this.forbiddenThemes))
     });
   }
 
@@ -135,7 +132,7 @@ export default class CreateScreen extends React.Component {
     d.setUTCSeconds(0)
     d.setUTCMilliseconds(0)
     this.wapDate = d
-    var date = d.toLocaleTimeString("en-US", {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:false})
+    var date = Moment(d.getTime()+d.getTimezoneOffset()*60*1000).format('LLLL')
     this.setState({date, isLoadingSchedule:false});
   }
 

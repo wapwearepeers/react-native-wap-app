@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 16,
   },
   text: {
     width: '100%',
     alignItems: 'center',
+    padding: 16,
   },
 });

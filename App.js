@@ -10,11 +10,12 @@ import { setCommunityIndex } from "./actions/communityActions"
 
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
-const SPLASH_SCREEN_MIN_DURATION = 2000
+//const SPLASH_SCREEN_MIN_DURATION = 0
 
 export default class AppContainer extends React.Component {
   state = {
     appIsReady: false,
+    hasFinishedMinDuration: true,
   };
 
   componentWillMount() {
@@ -22,9 +23,13 @@ export default class AppContainer extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.setState({hasFinishedMinDuration: true})
-    }, SPLASH_SCREEN_MIN_DURATION)
+    // if (SPLASH_SCREEN_MIN_DURATION > 0) {
+    //   setTimeout(() => {
+    //     this.setState({hasFinishedMinDuration: true})
+    //   }, SPLASH_SCREEN_MIN_DURATION)
+    // } else {
+    //   this.setState({hasFinishedMinDuration: true})
+    // }
   }
 
   async _loadAssetsAsync() {

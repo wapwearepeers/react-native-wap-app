@@ -7,8 +7,8 @@ import { SoftText } from '../../components/StyledText';
 import Colors from '../../constants/Colors'
 import FirebaseApp from '../../firebase.config.js';
 import * as FirebaseUtils from '../../utilities/FirebaseUtils.js';
+import Moment from 'moment'
 
-//const communityIndex = 1
 @connect((store) => {
   return {
     communityIndex: store.community.index
@@ -18,46 +18,14 @@ export class ExploreSectionListView extends Component {
 
   constructor(props) {
     super(props);
-    const dataBlob = {
-      // '5 may': [
-      //   {title:'Innovation & Design', tags:['informationredundance', 'educationchange'], participantCount:5, joined:true},
-      //   {title:'Art & Culture', tags:['digitalnomadlifestyle', 'creativewriting'], participantCount:2, joined:true},
-      //   {title:'Human Relationship', tags:['hackbrainreality', 'growthmindset'], participantCount:4, joined:false},
-      //   {title:'Better Work', tags:['relearntolearn', 'sellinnovativeservices'], participantCount:6, joined:false},
-      // ],
-      // '12 may': [
-      //   {title:'Pre-WAP', tags:['innovationanddesign'], participantCount:6, joined:false},
-      //   {title:'How To', tags:['organiccooking', 'findyourspontaneity'], participantCount:6, joined:true},
-      //   {title:'Human Relationship', tags:['hackbrainreality', 'growthmindset'], participantCount:4, joined:false},
-      //   {title:'Better Work', tags:['relearntolearn', 'sellinnovativeservices'], participantCount:6, joined:false},
-      // ],
-      // '17 may': [
-      //   {title:'Innovation & Design', tags:['informationredundance', 'educationchange'], participantCount:5, joined:true},
-      //   {title:'Art & Culture', tags:['digitalnomadlifestyle', 'creativewriting'], participantCount:2, joined:true},
-      //   {title:'Human Relationship', tags:['hackbrainreality', 'growthmindset'], participantCount:4, joined:false},
-      //   {title:'Better Work', tags:['relearntolearn', 'sellinnovativeservices'], participantCount:6, joined:false},
-      // ],
-    }
     this.state = {
       isLoading: true,
-      dataBlob,
+      dataBlob: {},
       dataSource: new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1 !== r2,
         sectionHeaderHasChanged: (s1, s2) => s1 !== s2
-      }).cloneWithRowsAndSections(dataBlob)
+      }).cloneWithRowsAndSections({})
     };
-
-
-    // setTimeout(() => {
-    //   const dataBlob = this.state.dataBlob;
-    //   dataBlob['K'] = ['Kata', 'Khalil', 'Kata', 'Khalil', 'Kata', 'Khalil', 'Kata', 'Khalil', 'Kata', 'Khalil']
-    //
-    //   console.log("------------------------------")
-    //   console.log(JSON.stringify(dataBlob))
-    //   console.log("------------------------------")
-    //
-    //   this.setState({dataBlob, dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlob)})
-    // }, 3000)
     const {communityIndex} = props
     this.communityIndex = communityIndex
     this._setRefs(communityIndex)
@@ -93,8 +61,9 @@ export class ExploreSectionListView extends Component {
     wapsRef.on('value', snap => {
       var val = FirebaseUtils.snapshotToArray(snap)
       var dataBlob = {}
+      var offset = new Date().getTimezoneOffset()*60*1000
       val.forEach(x => {
-        const key = new Date(x.timestamp).toLocaleTimeString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', hour12:false})
+        const key = Moment(x.timestamp+offset).format('LLLL')
         if (!dataBlob[key])
           dataBlob[key] = []
         dataBlob[key].push(x)
