@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ListView, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Platform, ListView, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux'
 import { ExploreRow } from './ExploreRow'
 import { SoftText } from '../../components/StyledText';
@@ -61,7 +61,7 @@ export class ExploreSectionListView extends Component {
     wapsRef.on('value', snap => {
       var val = FirebaseUtils.snapshotToArray(snap)
       var dataBlob = {}
-      var offset = new Date().getTimezoneOffset()*60*1000
+      var offset = Platform.OS === 'ios' ? 0 : new Date().getTimezoneOffset()*60*1000
       val.forEach(x => {
         const key = Moment(x.timestamp+offset).format('LLLL')
         if (!dataBlob[key])

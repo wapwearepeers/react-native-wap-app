@@ -132,7 +132,8 @@ export default class CreateScreen extends React.Component {
     d.setUTCSeconds(0)
     d.setUTCMilliseconds(0)
     this.wapDate = d
-    var date = Moment(d.getTime()+d.getTimezoneOffset()*60*1000).format('LLLL')
+    var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
+    var date = Moment(d.getTime()+offset).format('LLLL')
     this.setState({date, isLoadingSchedule:false});
   }
 
