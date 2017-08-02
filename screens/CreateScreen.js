@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform, View, Text, Button, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { connect } from 'react-redux'
 import Colors from '../constants/Colors';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
@@ -11,8 +12,13 @@ import Firebase from 'firebase'
 import FirebaseApp from '../firebase.config.js';
 import * as FirebaseUtils from '../utilities/FirebaseUtils.js';
 
-const idCommunity = "1"
 
+//const communityIndex = "1"
+@connect((store) => {
+  return {
+    communityIndex: store.community.index
+  }
+})
 export default class CreateScreen extends React.Component {
   static navigationOptions = {
     title: 'Create',
@@ -31,39 +37,66 @@ export default class CreateScreen extends React.Component {
       isLoadingPlaces: true,
       isLoadingSchedule: true,
     }
-    const db = FirebaseApp.database()
-    this.themesRef = db.ref(`themes/${idCommunity}`)
-    this.placesRef = db.ref(`places/${idCommunity}`)
-    this.wapsRef = db.ref(`waps/${idCommunity}`)
-    this.scheduleRef = db.ref(`communities/${idCommunity}/schedule/0`)
+    const {communityIndex} = props
+    this.communityIndex = communityIndex
+    this._setRefs(communityIndex)
   }
 
   componentDidMount() {
-    this.listenForThemes(this.themesRef);
-    this.listenForPlaces(this.placesRef);
-    this.listenForWaps(this.wapsRef);
-    this.downloadSchedule(this.scheduleRef);
+    this._subscribeAll()
   }
 
-  listenForThemes(ref) {
+  _refreshCommunity() {
+    const {communityIndex} = this.props
+    if (this.communityIndex != communityIndex) {
+        this.communityIndex = communityIndex
+        this._unsubscribeAll()
+        this._setRefs(communityIndex)
+        this._subscribeAll()
+    }
+  }
+
+  _unsubscribeAll() {
+    this.themesRef.off()
+    this.placesRef.off()
+    this.wapsRef.off()
+    this.scheduleRef.off()
+  }
+
+  _subscribeAll() {
+    this._listenForThemes(this.themesRef);
+    this._listenForPlaces(this.placesRef);
+    this._listenForWaps(this.wapsRef);
+    this._downloadSchedule(this.scheduleRef);
+  }
+
+  _setRefs(communityIndex) {
+    const db = FirebaseApp.database()
+    this.themesRef = db.ref(`themes/${communityIndex}`)
+    this.placesRef = db.ref(`places/${communityIndex}`)
+    this.wapsRef = db.ref(`waps/${communityIndex}`)
+    this.scheduleRef = db.ref(`communities/${communityIndex}/schedule/0`)
+  }
+
+  _listenForThemes(ref) {
     ref.on('value', snap => {
       //console.log("snap: " + JSON.stringify(snap.val()))
       var chooserOptionThemes = snap.val()
+      const t = this.newTheme
+      if (t && !chooserOptionThemes.includes(t))
+        chooserOptionThemes.push(t)
       this.setState({chooserOptionThemes, isLoadingThemes: false});
     });
   }
 
-  listenForPlaces(ref) {
+  _listenForPlaces(ref) {
     ref.on('value', snap => {
       var chooserOptionPlaces = snap.val()
-      const newTheme = this.newTheme
-      if (newTheme && !chooserOptionPlaces.includes(newTheme))
-        chooserOptionPlaces.push(newTheme)
       this.setState({chooserOptionPlaces, isLoadingPlaces: false});
     });
   }
 
-  listenForWaps(ref) {
+  _listenForWaps(ref) {
     ref.on('value', snap => {
       var waps = FirebaseUtils.snapshotToArray(snap)
       this.nextWeekThemes = []
@@ -82,7 +115,7 @@ export default class CreateScreen extends React.Component {
     });
   }
 
-  downloadSchedule(ref) {
+  _downloadSchedule(ref) {
     ref.once('value', snap => {
       this.schedule = snap.val()
       this._setDateFromSchedule(this.schedule)
@@ -324,6 +357,7 @@ After gathering, your group have the freedom to choose the place to start your W
   }
 
   render() {
+    this._refreshCommunity()
     return (
       <View style={styles.container}>
         <CreateThemeModal

@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Picker, Image, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { AsyncStorage, View, Image, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import ModalDropdown from 'react-native-modal-dropdown';
 import FirebaseApp from '../firebase.config.js';
 
 import { AccentText } from '../components/StyledText'
+import { setCommunityIndex } from "../actions/communityActions"
 
 import Colors from '../constants/Colors'
-
-const Item = Picker.Item;
 
 export default class SelectCommunityScreen extends React.Component {
   static navigationOptions = {
@@ -38,8 +37,8 @@ export default class SelectCommunityScreen extends React.Component {
     });
   }
 
-  _goToApp(community) {
-    this._navigateTo('RootNavigation')//, {community})
+  _goToApp() {
+    this._navigateTo('RootNavigation')
   }
 
   _navigateTo = (routeName: string) => {
@@ -51,8 +50,13 @@ export default class SelectCommunityScreen extends React.Component {
   }
 
   _onSelectCommunity(index, community) {
-    this.setState({community}, () => console.log("community: "+community))
-    this._navigateTo("RootNavigation")
+    AsyncStorage.setItem('communityIndex', index, () => {
+      this.setState({community}, () => {
+        this.props.dispatch(setCommunityIndex(index))
+        console.log("community: "+community)
+        this._goToApp()
+      })
+    })
   }
 
   render() {
@@ -64,7 +68,7 @@ export default class SelectCommunityScreen extends React.Component {
           <ActivityIndicator />
         ):(
           <ModalDropdown
-            style={ {width:"100%"} }
+            style={{width:"100%"}}
             dropdownStyle={styles.dropdownStyle}
             textStyle={styles.textStyle}
             dropdownTextStyle={styles.dropdownTextStyle}

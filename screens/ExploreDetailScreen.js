@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import Communications from 'react-native-communications';
+import { connect } from 'react-redux'
 
 import Colors from '../constants/Colors';
 import Styles from '../App.style';
@@ -16,8 +17,12 @@ import { ExploreDetailSlotManager } from './explore_detail/ExploreDetailSlotMana
 import { ExploreDetailSlotModal } from './explore_detail/ExploreDetailSlotModal';
 import FirebaseApp from '../firebase.config.js';
 
-const idCommunity = 1
-
+//const communityIndex = 1
+@connect((store) => {
+  return {
+    communityIndex: store.community.index
+  }
+})
 export default class ExploreDetailScreen extends React.Component {
   static navigationOptions = {
     title: 'WAP',
@@ -37,12 +42,41 @@ export default class ExploreDetailScreen extends React.Component {
     };
     this.editedParticipant = null
     this.editedParticipantIndex = -1
-    this.wapRef = FirebaseApp.database().ref(`waps/${idCommunity}/${key}`)
-    this.participantsRef = FirebaseApp.database().ref(`waps/${idCommunity}/${key}/participants`)
+
+    const {communityIndex} = props
+    this.communityIndex = communityIndex
+    this._setRefs(communityIndex, key)
+
   }
 
   componentDidMount() {
-    this._listenForWap(this.wapRef);
+    this._subscribeAll()
+  }
+
+  _refreshCommunity() {
+    const {communityIndex} = this.props
+    if (this.communityIndex != communityIndex) {
+        this.communityIndex = communityIndex
+        const key = this.props.navigation.state.params.wap.key
+        this._unsubscribeAll()
+        this._setRefs(communityIndex, key)
+        this._subscribeAll()
+    }
+  }
+
+  _unsubscribeAll() {
+    this.wapRef.off()
+  }
+
+  _subscribeAll() {
+    this._listenForWap(this.wapRef)
+  }
+
+  _setRefs(communityIndex, key) {
+    const db = FirebaseApp.database()
+    const wapUrl = `waps/${communityIndex}/${key}`
+    this.wapRef = db.ref(wapUrl)
+    this.participantsRef = db.ref(`${wapUrl}/participants`)
   }
 
   _listenForWap(wapRef) {
@@ -108,6 +142,7 @@ export default class ExploreDetailScreen extends React.Component {
   }
 
   render() {
+    this._refreshCommunity()
     const {tags, theme, date, place} = this.state
     var description = (tags ? tags.join(" ") : " ") + "\n"
     return (

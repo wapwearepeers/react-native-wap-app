@@ -1,19 +1,23 @@
 
 import React, { Component } from 'react';
 import { ListView, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { connect } from 'react-redux'
 import { ExploreRow } from './ExploreRow'
 import { SoftText } from '../../components/StyledText';
 import Colors from '../../constants/Colors'
 import FirebaseApp from '../../firebase.config.js';
 import * as FirebaseUtils from '../../utilities/FirebaseUtils.js';
 
-const idCommunity = 1
-
+//const communityIndex = 1
+@connect((store) => {
+  return {
+    communityIndex: store.community.index
+  }
+})
 export class ExploreSectionListView extends Component {
 
   constructor(props) {
     super(props);
-    this.wapsRef = FirebaseApp.database().ref("waps/"+idCommunity).orderByChild('createdAt')
     const dataBlob = {
       // '5 may': [
       //   {title:'Innovation & Design', tags:['informationredundance', 'educationchange'], participantCount:5, joined:true},
@@ -54,13 +58,38 @@ export class ExploreSectionListView extends Component {
     //
     //   this.setState({dataBlob, dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlob)})
     // }, 3000)
+    const {communityIndex} = props
+    this.communityIndex = communityIndex
+    this._setRefs(communityIndex)
   }
 
   componentDidMount() {
-    this.listenForWaps(this.wapsRef);
+    this._subscribeAll()
   }
 
-  listenForWaps(wapsRef) {
+  _refreshCommunity() {
+    const {communityIndex} = this.props
+    if (this.communityIndex != communityIndex) {
+        this.communityIndex = communityIndex
+        this._unsubscribeAll()
+        this._setRefs(communityIndex)
+        this._subscribeAll()
+    }
+  }
+
+  _unsubscribeAll() {
+    this.wapsRef.off()
+  }
+
+  _subscribeAll() {
+    this._listenForWaps(this.wapsRef);
+  }
+
+  _setRefs(communityIndex) {
+    this.wapsRef = FirebaseApp.database().ref("waps/"+communityIndex).orderByChild('createdAt')
+  }
+
+  _listenForWaps(wapsRef) {
     wapsRef.on('value', snap => {
       var val = FirebaseUtils.snapshotToArray(snap)
       var dataBlob = {}
@@ -93,6 +122,7 @@ export class ExploreSectionListView extends Component {
   }
 
   render() {
+    this._refreshCommunity()
     return (
       <View style={styles.container}>
         {this.state.isLoading ? (

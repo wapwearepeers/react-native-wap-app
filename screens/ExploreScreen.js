@@ -1,5 +1,8 @@
 import React from 'react';
 import {
+  AsyncStorage,
+  ActivityIndicator,
+  Dimensions,
   Linking,
   Platform,
   StyleSheet,
@@ -7,13 +10,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { connect } from 'react-redux'
 import { FontAwesome } from '@expo/vector-icons';
+import ModalDropdown from 'react-native-modal-dropdown';
+import { setCommunityIndex } from "../actions/communityActions"
 
 // import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 
 import { ExploreSectionListView } from './explore/ExploreSectionListView';
-import firebaseApp from '../firebase.config.js';
+import FirebaseApp from '../firebase.config.js';
+
+const padding = 16
+const dropdownHeight = 32
 
 export const EventButton = (props) => {
   let testButton = (
@@ -28,6 +37,11 @@ export const EventButton = (props) => {
   return testButton
 }
 
+@connect((store) => {
+  return {
+    communityIndex: store.community.index
+  }
+})
 export default class ExploreScreen extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
@@ -45,12 +59,53 @@ export default class ExploreScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.itemsRef = firebaseApp.database().ref()
+    this.state = {communities: [], isLoading: true}
+    this.communitiesRef = FirebaseApp.database().ref("communities")
+  }
+
+  componentDidMount() {
+    console.log("componentDidMount -> _queryCommunities")
+    this._queryCommunities(this.communitiesRef)
+  }
+
+  _queryCommunities(ref) {
+    ref.once('value').then(snap => {
+      var snapArray = snap.val()
+      //console.log(JSON.stringify(snapArray))
+      var communities = snapArray.map(x => x.name)
+      var isLoading = false
+      this.setState({communities, isLoading}, () => {
+        this.refs.modalDropdown.select(this.props.communityIndex)
+        console.log("called select")
+      })
+    });
+  }
+
+  _onSelectCommunity(index, community) {
+    this.setState({index}, () => { // HACK this state is useless but avoid doing async storage while already writing state
+      AsyncStorage.setItem('communityIndex', index, () => {
+        this.props.dispatch(setCommunityIndex(index))
+      })
+    })
   }
 
   render() {
     return (
       <View style={styles.container}>
+        {this.state.isLoading ? (
+          <ActivityIndicator style={{height:dropdownHeight}} />
+        ):(
+          <ModalDropdown
+            ref="modalDropdown"
+            style={styles.dropdown}
+            dropdownStyle={styles.dropdownStyle}
+            textStyle={styles.textStyle}
+            dropdownTextStyle={styles.dropdownTextStyle}
+            options={this.state.communities}
+            defaultValue="Choose your community ▼"
+            onSelect={this._onSelectCommunity.bind(this)}
+          />
+        )}
         <ExploreSectionListView
           onPressRow={this._onPressRow}
           style={styles.container}
@@ -108,6 +163,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    //justifyContent: 'center',
   },
   developmentModeText: {
     marginBottom: 20,
@@ -122,4 +178,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
+  dropdown: {
+    width: "100%",
+    height: dropdownHeight,
+    backgroundColor: Colors.sectionBackground,
+    padding: 8
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: Colors.tintColor,
+  },
+  dropdownTextStyle: {
+    fontSize: 14,
+  },
+  dropdownStyle: {
+    width: Dimensions.get('window').width - padding,
+    //padding,
+  }
 });
