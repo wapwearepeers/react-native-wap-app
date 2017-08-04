@@ -11,7 +11,7 @@ export default class SplashScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Image style={styles.imageLogo} source={require('../assets/images/wap-logo.png')}/>
+        <Image style={styles.imageLogo} source={require('../assets/icons/loading-icon.png')}/>
         <Text style={styles.textTagLine} fontSize="small">Meet and share your knowledge</Text>
         <ActivityIndicator />
       </View>

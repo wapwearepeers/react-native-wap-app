@@ -36,12 +36,11 @@ export class ExploreDetailSlotModal extends Component {
   }
 
   _canValidate() {
-    const {name, topic} = this.state
-    return name && topic && name != '' && topic != ''
+    const {name} = this.state
+    return name && name != ''
   }
-  // value={this.state.name}
+
   render() {
-    const focused = false
     return (
       <KeyboardAvoidingView behavior={'position'}>
         <Modal isVisible={this.state.modalVisible}
@@ -85,16 +84,16 @@ export class ExploreDetailSlotModal extends Component {
                 style={styles.iconEdit}
                 name={'pencil-square-o'}
                 size={24}
-                color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
+                color={Colors.tabIconDefault}
               />
             </View>
             <View style={{flexDirection: 'row', marginTop:padding}}>
               <View style={{flex:1}}>
                 <Button
-                  onPress={() => {this.setModalVisible(false)} }
+                  onPress={() => {this.setModalVisible(false)}}
                   title="Cancel"
                   color={Colors.tintColor}
-                  accessibilityLabel="Click here to Cancel"
+                  accessibilityLabel="Click here to cancel"
                 />
               </View>
               <View style={{flex:1, marginLeft:padding}}>
@@ -103,7 +102,7 @@ export class ExploreDetailSlotModal extends Component {
                   onPress={() => { this._onPressValidate() }}
                   title="Submit"
                   color={Colors.tintColor}
-                  accessibilityLabel="Click here to create a new Theme"
+                  accessibilityLabel="Click here to sumbit"
                 />
               </View>
             </View>
