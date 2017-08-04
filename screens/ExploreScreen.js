@@ -15,14 +15,17 @@ import { FontAwesome } from '@expo/vector-icons';
 import ModalDropdown from 'react-native-modal-dropdown';
 import { setCommunityIndex } from "../actions/communityActions"
 
-// import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 
 import { ExploreSectionListView } from './explore/ExploreSectionListView';
 import FirebaseApp from '../firebase.config.js';
+import * as FirebaseUtils from '../utilities/FirebaseUtils.js';
+import Moment from 'moment'
 
 const padding = 16
 const dropdownHeight = 32
+
+
 
 export const EventButton = (props) => {
   let testButton = (
@@ -37,6 +40,10 @@ export const EventButton = (props) => {
   return testButton
 }
 
+
+
+///////////////////////////////////
+// SCREEN STARTS HERE
 @connect((store) => {
   return {
     communityIndex: store.community.index
@@ -59,22 +66,70 @@ export default class ExploreScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {communities: [], isLoading: true}
-    this.communitiesRef = FirebaseApp.database().ref("communities")
+    this.state = {
+      communities: [],
+      dataBlob: {},
+      isLoadingDropdown: true,
+      isLoadingListView: true
+    }
+    const {communityIndex} = props
+    this.communityIndex = communityIndex
+    this._setRefs(communityIndex)
   }
 
   componentDidMount() {
     console.log("componentDidMount -> _queryCommunities")
-    this._queryCommunities(this.communitiesRef)
+    this._queryCommunities()
+    this._subscribeAll()
   }
 
-  _queryCommunities(ref) {
-    ref.once('value').then(snap => {
+  _refreshCommunity() {
+    const {communityIndex} = this.props
+    if (this.communityIndex != communityIndex) {
+        this.communityIndex = communityIndex
+        this._unsubscribeAll()
+        this._setRefs(communityIndex)
+        this._subscribeAll()
+    }
+  }
+
+  _unsubscribeAll() {
+    this.wapsRef.off()
+  }
+
+  _subscribeAll() {
+    this._listenForWaps(this.wapsRef);
+  }
+
+  _setRefs(communityIndex) {
+    this.wapsRef = FirebaseApp.database().ref(`waps/${communityIndex}`).orderByChild('timestamp').startAt(new Date().getTime())
+  }
+
+  _listenForWaps(wapsRef) {
+    wapsRef.on('value', snap => {
+      var val = FirebaseUtils.snapshotToArray(snap)
+      var dataBlob = {}
+      var offset = Platform.OS === 'ios' ? 0 : new Date().getTimezoneOffset()*60*1000
+      // val.sort(function (a, b) {
+      //   return a.createdAt - b.createdAt;
+      // });
+      val.forEach(x => {
+        const key = Moment(x.timestamp+offset).format('LLLL')
+        if (!dataBlob[key])
+          dataBlob[key] = []
+        dataBlob[key].push(x)
+      })
+      this.setState({dataBlob, isLoadingListView:false});
+    });
+  }
+
+  _queryCommunities() {
+    FirebaseApp.database().ref("communities").once('value').then(snap => {
       var snapArray = snap.val()
       //console.log(JSON.stringify(snapArray))
       var communities = snapArray.map(x => x.name)
-      var isLoading = false
-      this.setState({communities, isLoading}, () => {
+      var isLoadingDropdown = false
+      this.setState({communities, isLoadingDropdown}, () => {
         this.refs.modalDropdown.select(this.props.communityIndex)
         console.log("called select")
       })
@@ -82,7 +137,7 @@ export default class ExploreScreen extends React.Component {
   }
 
   _onSelectCommunity(index, community) {
-    this.setState({index}, () => { // HACK this state is useless but avoid doing async storage while already writing state
+    this.setState({isLoadingListView:true}, () => { // HACK this state is useless but avoid doing async storage while already writing state
       AsyncStorage.setItem('communityIndex', index, () => {
         this.props.dispatch(setCommunityIndex(index))
       })
@@ -90,9 +145,10 @@ export default class ExploreScreen extends React.Component {
   }
 
   render() {
+    this._refreshCommunity()
     return (
       <View style={styles.container}>
-        {this.state.isLoading ? (
+        {this.state.isLoadingDropdown ? (
           <ActivityIndicator style={{height:dropdownHeight}} />
         ):(
           <ModalDropdown
@@ -107,9 +163,12 @@ export default class ExploreScreen extends React.Component {
           />
         )}
         <ExploreSectionListView
+          ref="listView"
           onPressRow={this._onPressRow}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
+          dataBlob={this.state.dataBlob}
+          isLoading={this.state.isLoadingListView}
           />
       </View>
     );

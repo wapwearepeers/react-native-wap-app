@@ -1,77 +1,18 @@
 
 import React, { Component } from 'react';
-import { Platform, ListView, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { connect } from 'react-redux'
+import { Platform, Image, ListView, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ExploreRow } from './ExploreRow'
 import { SoftText } from '../../components/StyledText';
 import Colors from '../../constants/Colors'
-import FirebaseApp from '../../firebase.config.js';
-import * as FirebaseUtils from '../../utilities/FirebaseUtils.js';
-import Moment from 'moment'
 
-@connect((store) => {
-  return {
-    communityIndex: store.community.index
-  }
-})
 export class ExploreSectionListView extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      isLoading: true,
-      dataBlob: {},
-      dataSource: new ListView.DataSource({
-        rowHasChanged: (r1, r2) => r1 !== r2,
-        sectionHeaderHasChanged: (s1, s2) => s1 !== s2
-      }).cloneWithRowsAndSections({})
-    };
-    const {communityIndex} = props
-    this.communityIndex = communityIndex
-    this._setRefs(communityIndex)
-  }
-
-  componentDidMount() {
-    this._subscribeAll()
-  }
-
-  _refreshCommunity() {
-    const {communityIndex} = this.props
-    if (this.communityIndex != communityIndex) {
-        this.communityIndex = communityIndex
-        this._unsubscribeAll()
-        this._setRefs(communityIndex)
-        this._subscribeAll()
-    }
-  }
-
-  _unsubscribeAll() {
-    this.wapsRef.off()
-  }
-
-  _subscribeAll() {
-    this._listenForWaps(this.wapsRef);
-  }
-
-  _setRefs(communityIndex) {
-    this.wapsRef = FirebaseApp.database().ref("waps/"+communityIndex).orderByChild('createdAt')
-  }
-
-  _listenForWaps(wapsRef) {
-    wapsRef.on('value', snap => {
-      var val = FirebaseUtils.snapshotToArray(snap)
-      var dataBlob = {}
-      var offset = Platform.OS === 'ios' ? 0 : new Date().getTimezoneOffset()*60*1000
-      val.forEach(x => {
-        const key = Moment(x.timestamp+offset).format('LLLL')
-        if (!dataBlob[key])
-          dataBlob[key] = []
-        dataBlob[key].push(x)
-      })
-      var dataSource = this.state.dataSource.cloneWithRowsAndSections(dataBlob)
-      this.setState({dataBlob, dataSource, isLoading:false});
-
-    });
+    this.dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2
+    }).cloneWithRowsAndSections({})
   }
 
   _renderRow(row) {
@@ -90,19 +31,33 @@ export class ExploreSectionListView extends Component {
     )
   }
 
+  _renderListView(dataSource) {
+    const isEmpty = dataSource.getRowCount() == 0
+    if (isEmpty)
+      return (
+        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+          <Image source={require('../../assets/images/empty-wap-icon.png')}/>
+          <SoftText style={{textAlign:"center", margin:16}} fontSize="small">No future waps to come... {"\n"}Be the first one to create one !</SoftText>
+        </View>
+      )
+    else
+      return (
+        <ListView
+          dataSource={dataSource}
+          renderRow={this._renderRow.bind(this)}
+          renderSectionHeader={this._renderSectionHeader.bind(this)}
+        />
+      )
+  }
+
   render() {
-    this._refreshCommunity()
+    this.dataSource = this.dataSource.cloneWithRowsAndSections(this.props.dataBlob)
     return (
       <View style={styles.container}>
-        {this.state.isLoading ? (
-          <ActivityIndicator />
-        ):(
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this._renderRow.bind(this)}
-            renderSectionHeader={this._renderSectionHeader.bind(this)}
-          />
-        )}
+        {
+          this.props.isLoading ?
+          (<ActivityIndicator />) : this._renderListView(this.dataSource)
+        }
       </View>
     );
   }
