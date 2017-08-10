@@ -29,8 +29,9 @@ const styles = StyleSheet.create({
     padding
   },
   imageLogo: {
-    //height: 72,
-    //width: 221,
+    height: 72,
+    width: 221,
+    //width:'80%',
     margin:8
   },
   textTagLine: {
