@@ -40,7 +40,7 @@ export class CustomText extends React.Component {
 
 export class CustomTextInput extends React.Component {
   render() {
-    const fontSizeKey = this.props.fontSize ? this.props.fontSize : 'medium'
+    const fontSizeKey = this.props.fontSize ? this.props.fontSize : 'small'
     return (
       <TextInput
         {...this.props}

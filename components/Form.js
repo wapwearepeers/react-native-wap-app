@@ -26,7 +26,7 @@ export class BaseForm extends Component {
         ):(
           <View style={styles.containerMain}>
             <View style={styles.container}>
-              <SoftText fontSize="medium" style={styles.textTitle}>{this.props.title}</SoftText>
+              <SoftText fontSize="small" style={styles.textTitle}>{this.props.title}</SoftText>
                 { this.props.formContent }
               </View>
             { this.props.onPressInfo &&

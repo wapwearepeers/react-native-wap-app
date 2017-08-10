@@ -32,8 +32,8 @@ export const EventButton = (props) => {
   <TouchableOpacity onPress={() => props.navigation.navigate('Create', { name: 'Create'})}>
     <FontAwesome
       style={{margin:12}}
-      name={'plus'}
-      size={24}
+      name={'plus-circle'}
+      size={32}
       color={Colors.tabIconSelected}
     />
   </TouchableOpacity>)
@@ -52,14 +52,30 @@ export const EventButton = (props) => {
 export default class ExploreScreen extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
+    let { params } = navigation.state
     return {
-      title: 'Explore',
+      title: 'Agenda',
+      headerTitleStyle: {alignSelf:'center', fontWeight:'normal'},
       headerTintColor: "#000",
       headerRight: (
         <EventButton
           navigation={navigation}
         />
       ),
+      headerLeft: !params || params.isLoadingDropdown ? (
+          <ActivityIndicator style={{padding:8}} />
+        ):(
+          <ModalDropdown
+            ref="modalDropdown"
+            style={[styles.dropdown, {width:120}]}
+            dropdownStyle={styles.dropdownStyle}
+            textStyle={styles.textStyle}
+            dropdownTextStyle={styles.dropdownTextStyle}
+            options={params ? params.communities : null}
+            defaultValue={params ? params.defaultValue : "Choose your community ▼"}
+            onSelect={params ? params.onSelect : null}
+          />
+        )
     };
   };
 
@@ -67,9 +83,7 @@ export default class ExploreScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      communities: [],
       dataBlob: {},
-      isLoadingDropdown: true,
       isLoadingListView: true
     }
     const {communityIndex} = props
@@ -81,6 +95,7 @@ export default class ExploreScreen extends React.Component {
     console.log("componentDidMount -> _queryCommunities")
     this._queryCommunities()
     this._subscribeAll()
+    this.props.navigation.setParams({isLoadingDropdown:true, onSelect:this._onSelectCommunity.bind(this)})
   }
 
   _refreshCommunity() {
@@ -125,14 +140,12 @@ export default class ExploreScreen extends React.Component {
 
   _queryCommunities() {
     FirebaseApp.database().ref("communities").once('value').then(snap => {
-      var snapArray = snap.val()
-      //console.log(JSON.stringify(snapArray))
-      var communities = snapArray.map(x => x.name)
-      var isLoadingDropdown = false
-      this.setState({communities, isLoadingDropdown}, () => {
-        this.refs.modalDropdown.select(this.props.communityIndex)
-        console.log("called select")
-      })
+      let snapArray = snap.val()
+      let communities = snapArray.map(x => x.name)
+      let isLoadingDropdown = false
+      let {communityIndex} = this.props
+      let defaultValue = communities[this.props.communityIndex]
+      this.props.navigation.setParams({communities, isLoadingDropdown, communityIndex, defaultValue})
     });
   }
 
@@ -148,20 +161,6 @@ export default class ExploreScreen extends React.Component {
     this._refreshCommunity()
     return (
       <View style={styles.container}>
-        {this.state.isLoadingDropdown ? (
-          <ActivityIndicator style={{height:dropdownHeight}} />
-        ):(
-          <ModalDropdown
-            ref="modalDropdown"
-            style={styles.dropdown}
-            dropdownStyle={styles.dropdownStyle}
-            textStyle={styles.textStyle}
-            dropdownTextStyle={styles.dropdownTextStyle}
-            options={this.state.communities}
-            defaultValue="Choose your community ▼"
-            onSelect={this._onSelectCommunity.bind(this)}
-          />
-        )}
         <ExploreSectionListView
           ref="listView"
           onPressRow={this._onPressRow}
@@ -169,6 +168,7 @@ export default class ExploreScreen extends React.Component {
           contentContainerStyle={styles.contentContainer}
           dataBlob={this.state.dataBlob}
           isLoading={this.state.isLoadingListView}
+          onPressEmptyView={() => this.props.navigation.navigate('Create', { name: 'Create'})}
           />
       </View>
     );
@@ -240,7 +240,6 @@ const styles = StyleSheet.create({
   dropdown: {
     width: "100%",
     height: dropdownHeight,
-    backgroundColor: Colors.sectionBackground,
     padding: 8
   },
   textStyle: {

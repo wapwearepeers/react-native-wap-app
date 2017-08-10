@@ -32,7 +32,7 @@ const ExploreStackNavigator = StackNavigator(
 
 export default class ExploreNavigation extends React.Component {
   static navigationOptions = {
-    title: 'Explore',
+    title: 'Agenda',
     header: null,
     headerTintColor: Colors.tintColor,
   }

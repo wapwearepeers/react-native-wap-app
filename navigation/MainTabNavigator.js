@@ -31,20 +31,24 @@ export default TabNavigator(
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
         let iconName;
+        let size
         switch (routeName) {
           case 'Explore':
-            iconName = 'home';
+            iconName = 'calendar-o';
+            size = 30
             break;
           case 'Create':
-            iconName = 'plus';
+            iconName = 'plus-circle';
+            size = 30
             break;
           case 'Tips':
             iconName = 'lightbulb-o';
+            size = 34
         }
         return (
           <FontAwesome
             name={iconName}
-            size={24}
+            size={size}
             color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
           />
         );

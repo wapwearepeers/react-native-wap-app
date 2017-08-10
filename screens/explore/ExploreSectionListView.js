@@ -35,10 +35,10 @@ export class ExploreSectionListView extends Component {
     const isEmpty = dataSource.getRowCount() == 0
     if (isEmpty)
       return (
-        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+        <TouchableOpacity style={{flex:1, justifyContent:'center', alignItems:'center'}} onPress={this.props.onPressEmptyView}>
           <Image source={require('../../assets/images/empty-wap-icon.png')}/>
           <SoftText style={{textAlign:"center", margin:16}} fontSize="small">No future waps to come... {"\n"}Be the first one to create one !</SoftText>
-        </View>
+        </TouchableOpacity>
       )
     else
       return (

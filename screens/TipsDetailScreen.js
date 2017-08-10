@@ -14,7 +14,7 @@ export default class TipsDetailScreen extends React.Component {
   render() {
     return (
       <ScrollView style={styles.container}>
-        <AccentText style={styles.text} fontSize="medium">{this.props.navigation.state.params.content}</AccentText>
+        <AccentText style={styles.text} fontSize="small">{this.props.navigation.state.params.content}</AccentText>
       </ScrollView>
     );
   }
