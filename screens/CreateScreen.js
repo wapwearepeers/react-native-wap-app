@@ -93,9 +93,9 @@ export default class CreateScreen extends React.Component {
   _listenForPlaces(ref) {
     ref.on('value', snap => {
       var chooserOptionPlaces = snap.val()
-      const t = this.newPlace
-      if (t && !chooserOptionPlaces.includes(t))
-        chooserOptionPlaces.push(t)
+      const p = this.newPlace
+      if (p && !chooserOptionPlaces.includes(p))
+        chooserOptionPlaces.push(p)
       this.setState({chooserOptionPlaces, isLoadingPlaces: false});
     });
   }

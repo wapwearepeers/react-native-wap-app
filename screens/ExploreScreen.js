@@ -117,7 +117,10 @@ export default class ExploreScreen extends React.Component {
   }
 
   _setRefs(communityIndex) {
-    this.wapsRef = FirebaseApp.database().ref(`waps/${communityIndex}`).orderByChild('timestamp').startAt(new Date().getTime())
+    this.wapsRef = FirebaseApp.database()
+      .ref(`waps/${communityIndex}`)
+      .orderByChild('timestamp')
+      .startAt(new Date().getTime()-(2*3600*1000)); // 2 Hours in mili sec
   }
 
   _listenForWaps(wapsRef) {
