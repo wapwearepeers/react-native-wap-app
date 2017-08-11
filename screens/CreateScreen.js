@@ -7,7 +7,7 @@ import Moment from 'moment'
 import Colors from '../constants/Colors';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
-import { CreateThemeModal } from './create/CreateThemeModal';
+import { CreateValueModal } from './create/CreateValueModal';
 import { CreateInfoModal } from './create/CreateInfoModal';
 import Firebase from 'firebase'
 import FirebaseApp from '../firebase.config.js';
@@ -93,6 +93,9 @@ export default class CreateScreen extends React.Component {
   _listenForPlaces(ref) {
     ref.on('value', snap => {
       var chooserOptionPlaces = snap.val()
+      const t = this.newPlace
+      if (t && !chooserOptionPlaces.includes(t))
+        chooserOptionPlaces.push(t)
       this.setState({chooserOptionPlaces, isLoadingPlaces: false});
     });
   }
@@ -213,6 +216,10 @@ After gathering, your group have the freedom to choose the place to start your W
     this.refs.modalTheme.show()
   }
 
+  _onPressCreatePlace() {
+    this.refs.modalPlace.show()
+  }
+
   _onPressValidateCreateTheme(theme) {
     const chooserOptionThemes = []
     if (this.state.chooserOptionThemes)
@@ -226,6 +233,19 @@ After gathering, your group have the freedom to choose the place to start your W
     this.formChooserTheme.setState({value: theme})
   }
 
+  _onPressValidateCreatePlaces(place) {
+    const chooserOptionPlaces = []
+    if (this.state.chooserOptionPlaces)
+      this.state.chooserOptionPlaces.forEach(o => {
+        if (o !== this.newPlace)
+          chooserOptionPlaces.push(o)
+      })
+    chooserOptionPlaces.push(place)
+    this.newPlace = place
+    this.setState({chooserOptionPlaces, place})
+    this.formChooserPlace.setState({value: place})
+  }
+
   _showModal(modalInfoTitle, modalInfoDescription) {
     this.setState({modalInfoTitle, modalInfoDescription}, () => {
       this.refs.modalInfo.show()
@@ -235,6 +255,9 @@ After gathering, your group have the freedom to choose the place to start your W
   _onPressValidateCreateWap() {
     if (this.newTheme) 
       this.themesRef.set(this.state.chooserOptionThemes)
+    if (this.newPlace) 
+      this.placesRef.set(this.state.chooserOptionPlaces)
+
     var newWapRef = this.wapsRef.push()
     const {name, phone, theme, tags, topic, place} = this.state
     newWapRef.set({
@@ -333,13 +356,16 @@ After gathering, your group have the freedom to choose the place to start your W
           isLoading={isLoadingSchedule}
           />
         <FormChooser
+          ref={f => this.formChooserPlace = f}
           title="Place"
           description="Choose a place"
           onPressInfo={this._onPressInfoPlace.bind(this)}
           onSelectValue={this._onSelectValuePlace.bind(this)}
+          onPressCreate={this._onPressCreatePlace.bind(this)}
           chooser={chooser}
           chooseTitle="Choose a place"
           chooserOptions={chooserOptionPlaces}
+          chooserCreateTitle="Create a new place"
           isLoading={isLoadingPlaces}
           />
         {/*false && <Text>{name} | {phone} | {theme} | {topic} | {tags}</Text>*/}
@@ -358,10 +384,15 @@ After gathering, your group have the freedom to choose the place to start your W
     this._refreshCommunity()
     return (
       <View style={styles.container}>
-        <CreateThemeModal
+        <CreateValueModal
           ref="modalTheme"
           onPressValidate={this._onPressValidateCreateTheme.bind(this)}
-          currentThemes={this.state.chooserOptionThemes}
+          currentValues={this.state.chooserOptionThemes}
+          />
+        <CreateValueModal
+          ref="modalPlace"
+          onPressValidate={this._onPressValidateCreatePlaces.bind(this)}
+          currentValues={this.state.chooserOptionPlaces}
           />
         <CreateInfoModal
           ref="modalInfo"

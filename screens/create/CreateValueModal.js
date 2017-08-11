@@ -15,13 +15,13 @@ const paddingBottomText = 4
 const countSize = 32
 const participantSize = 50
 
-export class CreateThemeModal extends Component {
+export class CreateValueModal extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       modalVisible: false,
-      theme:'',
+      value:'',
     }
   }
 
@@ -29,16 +29,20 @@ export class CreateThemeModal extends Component {
     this.setState({modalVisible: visible});
   }
 
+  setValue(value, callback) {
+    this.setState({value}, callback);
+  }
+
   show() {
     this.setModalVisible(true)
   }
 
   _onPressValidate() {
-    var themes = this.props.currentThemes
-    var theme = this.state.theme.trim()
-    if (themes == null || !themes.includes(theme)) {
-      this.props.onPressValidate(theme)
-      this.setState({theme: null})
+    var values = this.props.currentValues
+    var value = this.state.value.trim()
+    if (values == null || !values.includes(value)) {
+      this.props.onPressValidate(value)
+      this.setState({value: null})
       this.setModalVisible(false)
     }
   }
@@ -65,9 +69,9 @@ export class CreateThemeModal extends Component {
                   ref="input"
                   autoFocus={true}
                   style={[Styles.textInput, {width:this.state.textInputWidth}]}
-                  value={this.state.theme}
+                  value={this.state.value}
                   placeholder={'Type here'}
-                  onChangeText={(theme) => this.setState({theme})}
+                  onChangeText={(value) => this.setState({value})}
                   onSubmitEditing={(event) => { this._onPressValidate() }}
                   autoCapitalize={'sentences'}
                 />
