@@ -13,7 +13,7 @@ import {
 import { connect } from 'react-redux'
 import { FontAwesome } from '@expo/vector-icons';
 import ModalDropdown from 'react-native-modal-dropdown';
-import { setCommunityIndex } from "../actions/communityActions"
+import { setCommunityId, setCommunityCanAddPlaces } from "../actions/communityActions"
 
 import Colors from '../constants/Colors'
 
@@ -46,7 +46,7 @@ export const EventButton = (props) => {
 // SCREEN STARTS HERE
 @connect((store) => {
   return {
-    communityIndex: store.community.index
+    communityId: store.community.id
   }
 })
 export default class ExploreScreen extends React.Component {
@@ -86,9 +86,9 @@ export default class ExploreScreen extends React.Component {
       dataBlob: {},
       isLoadingListView: true
     }
-    const {communityIndex} = props
-    this.communityIndex = communityIndex
-    this._setRefs(communityIndex)
+    const {communityId} = props
+    this.communityId = communityId
+    this._setRefs(communityId)
   }
 
   componentDidMount() {
@@ -99,11 +99,11 @@ export default class ExploreScreen extends React.Component {
   }
 
   _refreshCommunity() {
-    const {communityIndex} = this.props
-    if (this.communityIndex != communityIndex) {
-        this.communityIndex = communityIndex
+    const {communityId} = this.props
+    if (this.communityId != communityId) {
+        this.communityId = communityId
         this._unsubscribeAll()
-        this._setRefs(communityIndex)
+        this._setRefs(communityId)
         this._subscribeAll()
     }
   }
@@ -116,9 +116,9 @@ export default class ExploreScreen extends React.Component {
     this._listenForWaps(this.wapsRef);
   }
 
-  _setRefs(communityIndex) {
+  _setRefs(communityId) {
     this.wapsRef = FirebaseApp.database()
-      .ref(`waps/${communityIndex}`)
+      .ref(`waps/${communityId}`)
       .orderByChild('timestamp')
       .startAt(new Date().getTime()-(2*3600*1000)); // 2 Hours in mili sec
   }
@@ -143,19 +143,28 @@ export default class ExploreScreen extends React.Component {
 
   _queryCommunities() {
     FirebaseApp.database().ref("communities").once('value').then(snap => {
-      let snapArray = snap.val()
-      let communities = snapArray.map(x => x.name)
+      let communities = snap.val()
+      this.communities = communities
+      let communitiesJson = communities.map(x => x.name)
       let isLoadingDropdown = false
-      let {communityIndex} = this.props
-      let defaultValue = communities[this.props.communityIndex]
-      this.props.navigation.setParams({communities, isLoadingDropdown, communityIndex, defaultValue})
+      let {communityId} = this.props
+      let defaultValue = communities.filter(x => {console.log("x.id", x.id); console.log("communityId", communityId); return x.id == communityId})[0].name
+      this.props.navigation.setParams({communities: communitiesJson, isLoadingDropdown, communityId, defaultValue})
     });
   }
 
   _onSelectCommunity(index, community) {
-    this.setState({isLoadingListView:true}, () => { // HACK this state is useless but avoid doing async storage while already writing state
-      AsyncStorage.setItem('communityIndex', index, () => {
-        this.props.dispatch(setCommunityIndex(index))
+    var { canAddPlaces, id } = this.communities[index]
+    if (!canAddPlaces)
+      canAddPlaces = "false"
+    else
+      canAddPlaces = canAddPlaces.toString()
+
+    this.setState({isLoadingListView:true}, () => {
+      AsyncStorage.multiSet([['communityId', id.toString()], ['canAddPlaces', canAddPlaces]], () => {
+        this.props.dispatch(setCommunityId(id))
+        this.props.dispatch(setCommunityCanAddPlaces(canAddPlaces))
+        console.log("canAddPlaces", canAddPlaces)
       })
     })
   }

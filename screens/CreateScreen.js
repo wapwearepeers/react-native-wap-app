@@ -14,10 +14,11 @@ import FirebaseApp from '../firebase.config.js';
 import * as FirebaseUtils from '../utilities/FirebaseUtils.js';
 
 
-//const communityIndex = "1"
+//const communityId = "1"
 @connect((store) => {
   return {
-    communityIndex: store.community.index
+    communityId: store.community.id,
+    canAddPlaces: store.community.canAddPlaces
   }
 })
 export default class CreateScreen extends React.Component {
@@ -38,9 +39,9 @@ export default class CreateScreen extends React.Component {
       isLoadingPlaces: true,
       isLoadingSchedule: true,
     }
-    const {communityIndex} = props
-    this.communityIndex = communityIndex
-    this._setRefs(communityIndex)
+    const {communityId} = props
+    this.communityId = communityId
+    this._setRefs(communityId)
   }
 
   componentDidMount() {
@@ -48,11 +49,11 @@ export default class CreateScreen extends React.Component {
   }
 
   _refreshCommunity() {
-    const {communityIndex} = this.props
-    if (this.communityIndex != communityIndex) {
-        this.communityIndex = communityIndex
+    const {communityId} = this.props
+    if (this.communityId != communityId) {
+        this.communityId = communityId
         this._unsubscribeAll()
-        this._setRefs(communityIndex)
+        this._setRefs(communityId)
         this._subscribeAll()
     }
   }
@@ -71,12 +72,12 @@ export default class CreateScreen extends React.Component {
     this._downloadSchedule(this.scheduleRef);
   }
 
-  _setRefs(communityIndex) {
+  _setRefs(communityId) {
     const db = FirebaseApp.database()
-    this.themesRef = db.ref(`themes/${communityIndex}`)
-    this.placesRef = db.ref(`places/${communityIndex}`)
-    this.wapsRef = db.ref(`waps/${communityIndex}`)
-    this.scheduleRef = db.ref(`communities/${communityIndex}/schedule/0`)
+    this.themesRef = db.ref(`themes/${communityId}`)
+    this.placesRef = db.ref(`places/${communityId}`)
+    this.wapsRef = db.ref(`waps/${communityId}`)
+    this.scheduleRef = db.ref(`communities/${communityId}/schedule/0`)
   }
 
   _listenForThemes(ref) {
@@ -293,7 +294,23 @@ After gathering, your group have the freedom to choose the place to start your W
   getContent() {
     const placeholder = 'Type here'
     const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces} = this.state
+    const {canAddPlaces} = this.props
     var isButtonEnabled = name && phone && theme && tags && topic && place && this.wapDate
+
+    var onPressCreatePlace
+    var createNewPlaceTitle
+
+    console.log("onPressCreatePlace before", onPressCreatePlace)
+    console.log("createNewPlaceTitle before", createNewPlaceTitle)
+
+    if (canAddPlaces == "true") {
+      onPressCreatePlace = this._onPressCreatePlace.bind(this)
+      createNewPlaceTitle = "Create a new place"
+    }
+    console.log('canAddPlaces', canAddPlaces)
+    console.log("onPressCreatePlace", onPressCreatePlace)
+    console.log("createNewPlaceTitle", createNewPlaceTitle)
+
     return (
       <View>
         <FormTextInput
@@ -361,11 +378,11 @@ After gathering, your group have the freedom to choose the place to start your W
           description="Choose a place"
           onPressInfo={this._onPressInfoPlace.bind(this)}
           onSelectValue={this._onSelectValuePlace.bind(this)}
-          onPressCreate={this._onPressCreatePlace.bind(this)}
+          onPressCreate={onPressCreatePlace}
           chooser={chooser}
           chooseTitle="Choose a place"
           chooserOptions={chooserOptionPlaces}
-          chooserCreateTitle="Create a new place"
+          chooserCreateTitle={createNewPlaceTitle}
           isLoading={isLoadingPlaces}
           />
         {/*false && <Text>{name} | {phone} | {theme} | {topic} | {tags}</Text>*/}

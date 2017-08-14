@@ -1,15 +1,18 @@
 export default function reducer(state={
-  index: -1,
+  id: -1,
   name: null,
+  canAddPlaces: false,
 }, action) {
   switch (action.type) {
-    case "SET_INDEX":
-      return {...state, index: action.payload}
-    case "SET_NAME":
+    case "SET_COMMUNITY_ID":
+      return {...state, id: action.payload}
+    case "SET_COMMUNITY_NAME":
       return {...state, name: action.payload}
     case "SET_COMMUNITY":
-      var {name, index} = action.payload
-      return {...state, name, index}  
+      var {name, id} = action.payload
+      return {...state, name, id}
+    case "SET_CAN_ADD_PLACES":
+      return {...state, canAddPlaces: action.payload}
     default:
       return state
 

@@ -5,16 +5,23 @@ export function setCommunity(community) {
   }
 }
 
-export function setCommunityIndex(index) {
+export function setCommunityId(id) {
   return {
-    type: "SET_INDEX",
-    payload: index
+    type: "SET_COMMUNITY_ID",
+    payload: id
   }
 }
 
 export function setCommunityName(name) {
   return {
-    type: "SET_NAME",
+    type: "SET_COMMUNITY_NAME",
     payload: name
+  }
+}
+
+export function setCommunityCanAddPlaces(canAddPlaces) {
+  return {
+    type: "SET_COMMUNITY_CAN_ADD_PLACES",
+    payload: canAddPlaces
   }
 }

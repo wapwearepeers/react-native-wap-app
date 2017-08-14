@@ -1,14 +1,16 @@
 import React from 'react';
 import { AsyncStorage, View, Image, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { connect } from 'react-redux'
 import { NavigationActions } from 'react-navigation'
 import ModalDropdown from 'react-native-modal-dropdown';
 import FirebaseApp from '../firebase.config.js';
 
 import { AccentText } from '../components/StyledText'
-import { setCommunityIndex } from "../actions/communityActions"
+import { setCommunityId, setCommunityCanAddPlaces } from "../actions/communityActions"
 
 import Colors from '../constants/Colors'
 
+@connect()
 export default class SelectCommunityScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -30,6 +32,7 @@ export default class SelectCommunityScreen extends React.Component {
   _queryCommunities(itemsRef) {
     itemsRef.once('value').then(snap => {
       var snapArray = snap.val()
+      this.communities = snapArray
       console.log(JSON.stringify(snapArray))
       var communities = snapArray.map(x => x.name)
       var isLoading = false
@@ -50,10 +53,16 @@ export default class SelectCommunityScreen extends React.Component {
   }
 
   _onSelectCommunity(index, community) {
-    AsyncStorage.setItem('communityIndex', index, () => {
-      this.setState({community}, () => {
-        this.props.dispatch(setCommunityIndex(index))
-        console.log("community: "+community)
+    var { canAddPlaces, id } = this.communities[index]
+    if (!canAddPlaces)
+      canAddPlaces = "false"
+    else
+      canAddPlaces = canAddPlaces.toString()
+
+    this.setState({isLoadingListView:true}, () => { // HACK this state is useless but avoid doing async storage while already writing state
+      AsyncStorage.multiSet([['communityId', id.toString()], ['canAddPlaces', canAddPlaces]], () => {
+        this.props.dispatch(setCommunityId(id))
+        this.props.dispatch(setCommunityCanAddPlaces(canAddPlaces))
         this._goToApp()
       })
     })

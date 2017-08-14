@@ -6,7 +6,7 @@ import RootNavigation from './navigation/RootNavigation';
 import SplashScreen from './screens/SplashScreen';
 import FirstLaunchNavigation from './navigation/FirstLaunchNavigation';
 import Store from "./Store"
-import { setCommunityIndex } from "./actions/communityActions"
+import { setCommunityId, setCommunityCanAddPlaces } from "./actions/communityActions"
 
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 
@@ -50,16 +50,36 @@ export default class AppContainer extends React.Component {
       );
       console.log(e.message);
     } finally {
-      AsyncStorage.getItem('communityIndex', (err, communityIndex) => {
+      AsyncStorage.multiGet(['communityId', 'canAddPlaces'], (err, stores) =>{
         if (err) {
-          console.log("error: "+err);
+          console.log("error: ", err);
         } else {
-          console.log(communityIndex);
-          this.communityIndex = communityIndex
-          Store.dispatch(setCommunityIndex(communityIndex))
+          console.log("stores", stores);
+          stores.map((result, i, store) => {
+           // get at each store's key/value so you can work with it
+           let key = store[i][0];
+           let value = store[i][1];
+           switch(key) {
+             case 'communityId': this.communityId = value; break;
+             case 'canAddPlaces': this.canAddPlaces = value; break;
+           }
+          });
+          Store.dispatch(setCommunityId(this.communityId))
+          Store.dispatch(setCommunityCanAddPlaces(this.canAddPlaces))
           this.setState({ appIsReady: true });
         }
-      });
+      })
+
+      // AsyncStorage.getItem('communityId', (err, communityId) => {
+      //   if (err) {
+      //     console.log("error: ", err);
+      //   } else {
+      //     console.log(communityId);
+      //     this.communityId = communityId
+      //     Store.dispatch(setCommunityId(communityId))
+      //     this.setState({ appIsReady: true });
+      //   }
+      // });
     }
   }
 
@@ -71,7 +91,7 @@ export default class AppContainer extends React.Component {
             {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
             {Platform.OS === 'android' &&
               <View style={styles.statusBarUnderlay} />}
-            {this.communityIndex && this.communityIndex > -1 ? (
+            {this.communityId && this.communityId > -1 ? (
               <RootNavigation />
             ) : (
               <FirstLaunchNavigation />
