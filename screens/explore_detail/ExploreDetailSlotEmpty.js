@@ -1,4 +1,4 @@
-  
+
 import React, { Component } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
@@ -21,7 +21,7 @@ export class ExploreDetailSlotEmpty extends Component {
         <View style={styles.image} />
         <View style={styles.container}>
           <SoftText fontSize={'medium'} style={styles.textTitle}>Free spot</SoftText>
-          <SoftText fontSize={'small'} style={styles.textDescription}>Join to share about Innovative Design</SoftText>
+          <SoftText fontSize={'small'} style={styles.textDescription}>Join to share about {this.props.theme}</SoftText>
         </View>
         <FontAwesome
           style={styles.iconEdit}

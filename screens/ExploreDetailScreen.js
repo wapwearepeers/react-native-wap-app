@@ -161,6 +161,7 @@ export default class ExploreDetailScreen extends React.Component {
             style={{width:'100%'}}
             participants={this.state.participants}
             onPressSlot={this._onPressSlot.bind(this)}
+            theme={theme}
             />
         </View>
       </ScrollView>

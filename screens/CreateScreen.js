@@ -125,27 +125,46 @@ export default class CreateScreen extends React.Component {
     });
   }
 
+  _buildDateFromSchedule(s, addOneMoreWeek) {
+    var d = new Date();
+    var dif = s.day - d.getDay()
+    if (dif < 0)
+      dif = 7 + dif
+    var newDate = d.getDate()+dif
+    if (addOneMoreWeek) newDate += 7
+    d.setUTCDate(newDate)
+    d.setUTCHours(s.hour)
+    d.setUTCMinutes(s.min)
+    d.setUTCSeconds(0)
+    d.setUTCMilliseconds(0)
+    return d
+  }
+
+  _buildDateFormated(d) {
+    var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
+    var dateFormated = Moment(d.getTime()+offset).format('LLLL')
+    return dateFormated
+  }
+
   _setDateFromSchedule(schedule, addOneMoreWeek) {
     var chooserOptionDates = []
     this.wapDateArray = []
-    schedule.forEach((s, i) => {
-      var d = new Date();
-      var dif = s.day - d.getDay()
-      if (dif < 0)
-        dif = 7 + dif
-      var newDate = d.getDate()+dif
-      if (addOneMoreWeek) newDate += 7
-      d.setUTCDate(newDate)
-      d.setUTCHours(s.hour)
-      d.setUTCMinutes(s.min)
-      d.setUTCSeconds(0)
-      d.setUTCMilliseconds(0)
+
+    var addToArrays = (s, i, addOneMoreWeek) => {
+      var date = this._buildDateFromSchedule(s, addOneMoreWeek)
       if (i == 0)
-        this.wapDate = d
-      this.wapDateArray.push(d)
-      var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
-      var date = Moment(d.getTime()+offset).format('LLLL')
-      chooserOptionDates.push(date)
+        this.wapDate = date
+      this.wapDateArray.push(date)
+      var dateFormated = this._buildDateFormated(date)
+      chooserOptionDates.push(dateFormated)
+    }
+
+    schedule.forEach((s, i) => {
+      addToArrays(s, i, false)
+    })
+
+    schedule.forEach((s, i) => {
+      addToArrays(s, i, true)
     })
 
     this.setState({chooserOptionDates, isLoadingSchedule:false});

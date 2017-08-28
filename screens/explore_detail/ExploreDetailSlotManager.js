@@ -37,7 +37,7 @@ export class ExploreDetailSlotManager extends Component {
     for (i = this.props.participants.length; i < maxParticipantCount; i++)
       slotEmptyList.push(
         <TouchableOpacity key={`empty_${i}`} onPress={this._onPressSlotEmpty.bind(this, i)} style={styles.containerSlot}>
-          <ExploreDetailSlotEmpty index={i+1} />
+          <ExploreDetailSlotEmpty theme={this.props.theme} index={i+1} />
         </TouchableOpacity>
       )
     return slotEmptyList
