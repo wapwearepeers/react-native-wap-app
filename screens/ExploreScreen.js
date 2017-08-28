@@ -127,7 +127,7 @@ export default class ExploreScreen extends React.Component {
     wapsRef.on('value', snap => {
       var val = FirebaseUtils.snapshotToArray(snap)
       var dataBlob = {}
-      var offset = Platform.OS === 'ios' ? 0 : new Date().getTimezoneOffset()*60*1000
+      var offset = 0 //Platform.OS === 'ios' ? 0 : new Date().getTimezoneOffset()*60*1000
       // val.sort(function (a, b) {
       //   return a.createdAt - b.createdAt;
       // });

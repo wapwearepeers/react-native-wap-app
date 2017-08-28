@@ -141,7 +141,8 @@ export default class CreateScreen extends React.Component {
   }
 
   _buildDateFormated(d) {
-    var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
+    console.log("Platform.OS", Platform.OS)
+    var offset = 0//Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
     var dateFormated = Moment(d.getTime()+offset).format('LLLL')
     return dateFormated
   }
@@ -212,11 +213,7 @@ In this WAP, your sharing should be related to ${currentTheme}.`
   _onPressInfoPlace() {
     this._showModal(
       "What are the places?",
-      `These places are chosen as the best open places in your campus for knowledge sharing.
-
-At each place, you will find a WAP sign where you will meet your group.
-
-After gathering, your group have the freedom to choose the place to start your WAP.`
+      `WAP happens in both physical or virtual places. The proposed physical places are selected to be the best for knowledge sharing. At each physical place, you will find a WAP sign where you will meet your group.`
     )
   }
 
