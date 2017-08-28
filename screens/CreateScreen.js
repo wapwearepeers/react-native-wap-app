@@ -36,6 +36,7 @@ export default class CreateScreen extends React.Component {
       topic: '',
       chooserOptionThemes: [],
       chooserOptionPlaces: [],
+      chooserOptionDates: [],
       isLoadingThemes: true,
       isLoadingPlaces: true,
       isLoadingSchedule: true,
@@ -62,14 +63,14 @@ export default class CreateScreen extends React.Component {
   _unsubscribeAll() {
     this.themesRef.off()
     this.placesRef.off()
-    this.wapsRef.off()
+    //this.wapsRef.off()
     this.scheduleRef.off()
   }
 
   _subscribeAll() {
     this._listenForThemes(this.themesRef);
     this._listenForPlaces(this.placesRef);
-    this._listenForWaps(this.wapsRef);
+    //this._listenForWaps(this.wapsRef);
     this._downloadSchedule(this.scheduleRef);
   }
 
@@ -78,7 +79,7 @@ export default class CreateScreen extends React.Component {
     this.themesRef = db.ref(`themes/${communityId}`)
     this.placesRef = db.ref(`places/${communityId}`)
     this.wapsRef = db.ref(`waps/${communityId}`)
-    this.scheduleRef = db.ref(`communities/${communityId}/schedule/0`)
+    this.scheduleRef = db.ref(`communities/${communityId}/schedule/`)
   }
 
   _listenForThemes(ref) {
@@ -103,18 +104,18 @@ export default class CreateScreen extends React.Component {
   }
 
   _listenForWaps(ref) {
-    ref.on('value', snap => {
-      var waps = FirebaseUtils.snapshotToArray(snap)
-      this.nextWeekThemes = []
-      this.forbiddenThemes = []
-      waps.forEach(wap => {
-        const {theme} = wap
-        if (this.nextWeekThemes.includes(theme))
-          this.forbiddenThemes.push(theme)
-        else
-          this.nextWeekThemes.push(theme)
-      })
-    });
+    // ref.on('value', snap => {
+    //   var waps = FirebaseUtils.snapshotToArray(snap)
+    //   this.nextWeekThemes = []
+    //   this.forbiddenThemes = []
+    //   waps.forEach(wap => {
+    //     const {theme} = wap
+    //     if (this.nextWeekThemes.includes(theme))
+    //       this.forbiddenThemes.push(theme)
+    //     else
+    //       this.nextWeekThemes.push(theme)
+    //   })
+    // });
   }
 
   _downloadSchedule(ref) {
@@ -125,21 +126,29 @@ export default class CreateScreen extends React.Component {
   }
 
   _setDateFromSchedule(schedule, addOneMoreWeek) {
-    var d = new Date();
-    var dif = schedule.day - d.getDay()
-    if (dif < 0)
-      dif = 7 + dif
-    var newDate = d.getDate()+dif
-    if (addOneMoreWeek) newDate += 7
-    d.setUTCDate(newDate)
-    d.setUTCHours(schedule.hour)
-    d.setUTCMinutes(schedule.min)
-    d.setUTCSeconds(0)
-    d.setUTCMilliseconds(0)
-    this.wapDate = d
-    var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
-    var date = Moment(d.getTime()+offset).format('LLLL')
-    this.setState({date, isLoadingSchedule:false});
+    var chooserOptionDates = []
+    this.wapDateArray = []
+    schedule.forEach((s, i) => {
+      var d = new Date();
+      var dif = s.day - d.getDay()
+      if (dif < 0)
+        dif = 7 + dif
+      var newDate = d.getDate()+dif
+      if (addOneMoreWeek) newDate += 7
+      d.setUTCDate(newDate)
+      d.setUTCHours(s.hour)
+      d.setUTCMinutes(s.min)
+      d.setUTCSeconds(0)
+      d.setUTCMilliseconds(0)
+      if (i == 0)
+        this.wapDate = d
+      this.wapDateArray.push(d)
+      var offset = Platform.OS == 'ios' ? 0 : d.getTimezoneOffset()*60*1000
+      var date = Moment(d.getTime()+offset).format('LLLL')
+      chooserOptionDates.push(date)
+    })
+
+    this.setState({chooserOptionDates, isLoadingSchedule:false});
   }
 
   _onChangeTextName(name) {
@@ -174,7 +183,7 @@ In this WAP, your sharing should be related to ${currentTheme}.`
     )
   }
 
-  _onPressInfoTime() {
+  _onPressInfoDate() {
     this._showModal(
       "Why can’t I choose the time?",
       "WAP is organized regularly on the same date and time in order to gather the community together."
@@ -193,25 +202,33 @@ After gathering, your group have the freedom to choose the place to start your W
   }
 
   _onSelectValueTheme(theme, index) {
-    if (this.forbiddenThemes.includes(theme)) {
-      this.formChooserTheme.setState({value: null}, () => {
-        this.setState({theme:null}, () => {
-          this._showModal(
-            "Can't select this theme",
-            "They already are 2 WAP currently happening with this theme. Please join one of theme or select another theme."
-          )
-        })
-      })
-    } else {
-      if (this.nextWeekThemes.includes(theme)) {
-        this._setDateFromSchedule(this.schedule, true)
-      }
-      this.setState({theme})
-    }
+    // if (this.forbiddenThemes.includes(theme)) {
+    //   this.formChooserTheme.setState({value: null}, () => {
+    //     this.setState({theme:null}, () => {
+    //       this._showModal(
+    //         "Can't select this theme",
+    //         "They already are 2 WAP currently happening with this theme. Please join one of theme or select another theme."
+    //       )
+    //     })
+    //   })
+    // } else {
+    //   if (this.nextWeekThemes.includes(theme)) {
+    //     this._setDateFromSchedule(this.schedule, true)
+    //   }
+    //   this.setState({theme})
+    // }
+    // NO MORE LIMITATION
+    this.setState({theme})
   }
 
   _onSelectValuePlace(place, index) {
     this.setState({place})
+  }
+
+  _onSelectValueDate(date, index) {
+    var i = index - 1
+    this.wapDate = this.wapDateArray[i]
+    this.setState({date})
   }
 
   _onPressCreateTheme() {
@@ -294,23 +311,16 @@ After gathering, your group have the freedom to choose the place to start your W
 
   getContent() {
     const placeholder = 'Type here'
-    const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces} = this.state
+    const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces, chooserOptionDates} = this.state
     const {canAddPlaces} = this.props
-    var isButtonEnabled = name && phone && theme && tags && place && this.wapDate
+    var isButtonEnabled = name && phone && theme && tags && place && date && this.wapDate
 
     var onPressCreatePlace
     var createNewPlaceTitle
-
-    //console.log("onPressCreatePlace before", onPressCreatePlace)
-    //console.log("createNewPlaceTitle before", createNewPlaceTitle)
-
     if (canAddPlaces == "true") {
       onPressCreatePlace = this._onPressCreatePlace.bind(this)
       createNewPlaceTitle = "Create a new place"
     }
-    //console.log('canAddPlaces', canAddPlaces)
-    //console.log("onPressCreatePlace", onPressCreatePlace)
-    //console.log("createNewPlaceTitle", createNewPlaceTitle)
 
     return (
       <View>
@@ -367,10 +377,20 @@ After gathering, your group have the freedom to choose the place to start your W
             onChangeText: this._onChangeTextTopic.bind(this),
           }}
           />
-        <FormTextDescription
+        {/*<FormTextDescription
           title="Time"
           description={date}
-          onPressInfo={this._onPressInfoTime.bind(this)}
+          onPressInfo={this._onPressInfoDate.bind(this)}
+          isLoading={isLoadingSchedule}
+          />*/}
+        <FormChooser
+          title="Date"
+          description="Choose a date"
+          onPressInfo={this._onPressInfoDate.bind(this)}
+          onSelectValue={this._onSelectValueDate.bind(this)}
+          chooser={chooser}
+          chooseTitle="Choose a date"
+          chooserOptions={chooserOptionDates}
           isLoading={isLoadingSchedule}
           />
         <FormChooser
