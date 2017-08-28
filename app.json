@@ -5,7 +5,7 @@
     "slug": "expo-wap-app",
     "privacy": "public",
     "sdkVersion": "19.0.0",
-    "version": "1.0.0",
+    "version": "0.1.1",
     "orientation": "portrait",
     "primaryColor": "#315ADA",
     "icon": "./assets/icons/app-icon.png",
@@ -25,7 +25,8 @@
       "bundleIdentifier": "com.wearetheprojects.wap"
     },
     "android": {
-      "package": "com.wearetheprojects.wap"
+      "package": "com.wearetheprojects.wap",
+      "versionCode": 3
     }
   }
 }

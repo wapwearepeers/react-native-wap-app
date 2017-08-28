@@ -11,7 +11,7 @@ export default function reducer(state={
     case "SET_COMMUNITY":
       var {name, id} = action.payload
       return {...state, name, id}
-    case "SET_CAN_ADD_PLACES":
+    case "SET_COMMUNITY_CAN_ADD_PLACES":
       return {...state, canAddPlaces: action.payload}
     default:
       return state

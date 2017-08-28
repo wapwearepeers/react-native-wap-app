@@ -35,7 +35,10 @@ export default class AppContainer extends React.Component {
   async _loadAssetsAsync() {
     try {
       await cacheAssetsAsync({
-        images: [require('./assets/images/expo-wordmark.png')],
+        images: [
+          require('./assets/images/expo-wordmark.png'),
+          require('./assets/images/empty-wap-icon.png')
+        ],
         fonts: [
           FontAwesome.font,
           //{ 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
@@ -50,7 +53,7 @@ export default class AppContainer extends React.Component {
       );
       console.log(e.message);
     } finally {
-      AsyncStorage.multiGet(['communityId', 'canAddPlaces'], (err, stores) =>{
+      AsyncStorage.multiGet(['communityId', 'canAddPlaces'], (err, stores) => {
         if (err) {
           console.log("error: ", err);
         } else {

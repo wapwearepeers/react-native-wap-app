@@ -33,6 +33,7 @@ export default class CreateScreen extends React.Component {
     this.state = {
       name: '',
       date: '',
+      topic: '',
       chooserOptionThemes: [],
       chooserOptionPlaces: [],
       isLoadingThemes: true,
@@ -295,21 +296,21 @@ After gathering, your group have the freedom to choose the place to start your W
     const placeholder = 'Type here'
     const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces} = this.state
     const {canAddPlaces} = this.props
-    var isButtonEnabled = name && phone && theme && tags && topic && place && this.wapDate
+    var isButtonEnabled = name && phone && theme && tags && place && this.wapDate
 
     var onPressCreatePlace
     var createNewPlaceTitle
 
-    console.log("onPressCreatePlace before", onPressCreatePlace)
-    console.log("createNewPlaceTitle before", createNewPlaceTitle)
+    //console.log("onPressCreatePlace before", onPressCreatePlace)
+    //console.log("createNewPlaceTitle before", createNewPlaceTitle)
 
     if (canAddPlaces == "true") {
       onPressCreatePlace = this._onPressCreatePlace.bind(this)
       createNewPlaceTitle = "Create a new place"
     }
-    console.log('canAddPlaces', canAddPlaces)
-    console.log("onPressCreatePlace", onPressCreatePlace)
-    console.log("createNewPlaceTitle", createNewPlaceTitle)
+    //console.log('canAddPlaces', canAddPlaces)
+    //console.log("onPressCreatePlace", onPressCreatePlace)
+    //console.log("createNewPlaceTitle", createNewPlaceTitle)
 
     return (
       <View>

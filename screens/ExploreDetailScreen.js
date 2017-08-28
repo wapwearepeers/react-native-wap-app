@@ -180,6 +180,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding,
   },
+  textTitle: {
+    textAlign: 'center',
+  },
   textDescription: {
     marginTop: padding/2,
     textAlign: 'center',
