@@ -6,8 +6,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '../../constants/Colors';
 //import { ExploreParticipantCount } from './ExploreParticipantCount';
 
-const maxParticipantCount = 6
-
 export class ExploreDetailSlot extends Component {
 
   constructor(props) {

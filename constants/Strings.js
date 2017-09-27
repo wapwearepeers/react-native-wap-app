@@ -6,11 +6,13 @@ export default {
     },
     INFO_TOPIC: {
       title: "What is a sharing?",
-      description: `A sharing can be either your experience, interest, knowledge or questions.
+      description: function(currentTheme) {
+        return `A sharing can be either your experience, interest, knowledge or questions.
 
 You can share through showing, explaining, discussions or activities within 20 min.
 
-In this WAP, your sharing should be related to ${currentTheme}.`,
+In this WAP, your sharing should be related to ${currentTheme}.`
+      },
     },
     INFO_DATE: {
       title: "Why can’t I choose the time?",

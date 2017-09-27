@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from 'react-redux'
 import Moment from 'moment'
 import Colors from '../constants/Colors';
-import { create: {INFO_THEME, INFO_TOPIC, INFO_DATE, INFO_PLACE} } from '../constants/Strings';
+import Strings from '../constants/Strings';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
 import KeyboardAwareScrollViewCompat from '../components/KeyboardAwareScrollViewCompat';
@@ -186,21 +186,25 @@ export default class CreateScreen extends React.Component {
   }
 
   _onPressInfoTheme() {
-    this._showModal(INFO_THEME)
+    const { title, description } = Strings.create.INFO_THEME
+    this._showModal(title, description)
   }
 
   _onPressInfoTopic() {
     const {theme} = this.state
     var currentTheme = theme ? `"${theme}"` : "the current theme"
-    this._showModal(INFO_TOPIC)
+    const { title, description } = Strings.create.INFO_TOPIC
+    this._showModal(title, description(currentTheme))
   }
 
   _onPressInfoDate() {
-    this._showModal(INFO_DATE)
+    const { title, description } = Strings.create.INFO_DATE
+    this._showModal(title, description)
   }
 
   _onPressInfoPlace() {
-    this._showModal(INFO_PLACE)
+    const { title, description } = Strings.create.INFO_PLACE
+    this._showModal(title, description)
   }
 
   _onSelectValueTheme(theme, index) {
@@ -267,8 +271,8 @@ export default class CreateScreen extends React.Component {
     this.formChooserPlace.setState({value: place})
   }
 
-  _showModal(modalContent) {
-    this.setState({modalInfoTitle: modalContent.title, modalInfoDescription: modalContent.description}, () => {
+  _showModal(modalInfoTitle, modalInfoDescription) {
+    this.setState({modalInfoTitle, modalInfoDescription}, () => {
       this.refs.modalInfo.show()
     })
   }

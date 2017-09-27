@@ -4,8 +4,7 @@ import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
 import { ExploreDetailSlot } from './ExploreDetailSlot';
 import { ExploreDetailSlotEmpty } from './ExploreDetailSlotEmpty';
-
-const maxParticipantCount = 6
+import Numbers from '../../constants/Numbers';
 
 export class ExploreDetailSlotManager extends Component {
 
@@ -34,7 +33,7 @@ export class ExploreDetailSlotManager extends Component {
 
   _buildSlotEmptyList() {
     const slotEmptyList = []
-    for (i = this.props.participants.length; i < maxParticipantCount; i++)
+    for (i = this.props.participants.length; i < Numbers.MAX_PARTICIPANT_COUNT; i++)
       slotEmptyList.push(
         <TouchableOpacity key={`empty_${i}`} onPress={this._onPressSlotEmpty.bind(this, i)} style={styles.containerSlot}>
           <ExploreDetailSlotEmpty theme={this.props.theme} index={i+1} />

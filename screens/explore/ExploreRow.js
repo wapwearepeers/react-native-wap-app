@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AccentText, SoftText } from '../../components/StyledText';
 import { ExploreParticipantCount } from './ExploreParticipantCount';
-
-const maxParticipantCount = 6
+import Numbers from '../../constants/Numbers';
 
 export class ExploreRow extends Component {
 
@@ -19,7 +18,7 @@ export class ExploreRow extends Component {
           <AccentText fontSize={'medium'} style={styles.textTitle}>{this.props.title}</AccentText>
           <SoftText fontSize={'small'} style={styles.textDescription}>{this.props.description}</SoftText>
         </View>
-        <ExploreParticipantCount maxCount={maxParticipantCount} count={this.props.participantCount} joined={this.props.joined} />
+        <ExploreParticipantCount maxCount={Numbers.MAX_PARTICIPANT_COUNT} count={this.props.participantCount} joined={this.props.joined} />
       </View>
     );
   }
