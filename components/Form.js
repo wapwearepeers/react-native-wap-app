@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import { Keyboard, StyleSheet, View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { AccentText, SoftText, SoftThinText } from './StyledText';
@@ -22,7 +21,7 @@ export class BaseForm extends Component {
     return (
       <View>
         {this.props.isLoading ? (
-          <ActivityIndicator />
+          <ActivityIndicator style={styles.activityIndicator} />
         ):(
           <View style={styles.containerMain}>
             <View style={styles.container}>
@@ -248,5 +247,8 @@ const styles = StyleSheet.create({
   },
   textDescription: {
 
+  },
+  activityIndicator: {
+    height:80,
   }
 })

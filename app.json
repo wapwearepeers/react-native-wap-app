@@ -27,6 +27,9 @@
     "android": {
       "package": "com.wearetheprojects.wap",
       "versionCode": 3
-    }
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#eeeeee",
+    },
   }
 }

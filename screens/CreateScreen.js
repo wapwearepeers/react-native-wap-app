@@ -5,8 +5,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from 'react-redux'
 import Moment from 'moment'
 import Colors from '../constants/Colors';
+import { create: {INFO_THEME, INFO_TOPIC, INFO_DATE, INFO_PLACE} } from '../constants/Strings';
 import { FormTextInput, FormTextDescription, FormTextInputHashtags, FormChooser } from '../components/Form';
 import { ChooserText } from '../components/Chooser';
+import KeyboardAwareScrollViewCompat from '../components/KeyboardAwareScrollViewCompat';
 import { CreateValueModal } from './create/CreateValueModal';
 import { CreateInfoModal } from './create/CreateInfoModal';
 import Firebase from 'firebase'
@@ -184,37 +186,21 @@ export default class CreateScreen extends React.Component {
   }
 
   _onPressInfoTheme() {
-    this._showModal(
-      "Why are some WAP themes unusable?",
-      "When a theme is unusable, it means there are existing WAP proposals using this theme. In this case, you can either join the existing WAP, or create a different theme."
-    )
+    this._showModal(INFO_THEME)
   }
 
   _onPressInfoTopic() {
     const {theme} = this.state
     var currentTheme = theme ? `"${theme}"` : "the current theme"
-    this._showModal(
-      "What is a sharing?",
-      `A sharing can be either your experience, interest, knowledge or questions.
-
-You can share through showing, explaining, discussions or activities within 20 min.
-
-In this WAP, your sharing should be related to ${currentTheme}.`
-    )
+    this._showModal(INFO_TOPIC)
   }
 
   _onPressInfoDate() {
-    this._showModal(
-      "Why can’t I choose the time?",
-      "WAP is organized regularly on the same date and time in order to gather the community together."
-    )
+    this._showModal(INFO_DATE)
   }
 
   _onPressInfoPlace() {
-    this._showModal(
-      "What are the places?",
-      `WAP happens in both physical or virtual places. The proposed physical places are selected to be the best for knowledge sharing. At each physical place, you will find a WAP sign where you will meet your group.`
-    )
+    this._showModal(INFO_PLACE)
   }
 
   _onSelectValueTheme(theme, index) {
@@ -281,8 +267,8 @@ In this WAP, your sharing should be related to ${currentTheme}.`
     this.formChooserPlace.setState({value: place})
   }
 
-  _showModal(modalInfoTitle, modalInfoDescription) {
-    this.setState({modalInfoTitle, modalInfoDescription}, () => {
+  _showModal(modalContent) {
+    this.setState({modalInfoTitle: modalContent.title, modalInfoDescription: modalContent.description}, () => {
       this.refs.modalInfo.show()
     })
   }
@@ -307,25 +293,8 @@ In this WAP, your sharing should be related to ${currentTheme}.`
     this.props.navigation.goBack()
   }
 
-  getContainerFromPlatform(content) {
-    //if (Platform.OS === 'ios') {
-      return (
-        <KeyboardAwareScrollView>
-          {content}
-        </KeyboardAwareScrollView>
-      )
-    //}
-
-    // return (
-    //   <ScrollView>
-    //     <KeyboardAvoidingView behavior="padding">
-    //       {content}
-    //     </KeyboardAvoidingView>
-    //   </ScrollView>
-    // )
-  }
-
-  getContent() {
+  render() {
+    this._refreshCommunity()
     const placeholder = 'Type here'
     const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces, chooserOptionDates} = this.state
     const {canAddPlaces} = this.props
@@ -337,105 +306,6 @@ In this WAP, your sharing should be related to ${currentTheme}.`
       onPressCreatePlace = this._onPressCreatePlace.bind(this)
       createNewPlaceTitle = "Create a new place"
     }
-
-    return (
-      <View>
-        <FormTextInput
-          title="Your name"
-          nextFocus={this.refs.inputPhone}
-          inputProps={{
-            placeholder,
-            value: name,
-            onChangeText: this._onChangeTextName.bind(this),
-          }}
-        />
-        <FormTextInput
-          ref="inputPhone"
-          nextFocus={this.refs.inputTags}
-          title="Your phone number"
-          inputProps={{
-            placeholder,
-            value: phone,
-            onChangeText: this._onChangeTextPhone.bind(this),
-            keyboardType: "phone-pad",
-          }}
-          />
-        <FormChooser
-          ref={f => this.formChooserTheme = f}
-          title="Theme"
-          description="Choose a theme"
-          onPressInfo={this._onPressInfoTheme.bind(this)}
-          onSelectValue={this._onSelectValueTheme.bind(this)}
-          onPressCreate={this._onPressCreateTheme.bind(this)}
-          chooser={chooser}
-          chooseTitle="Choose a WAP theme"
-          chooserOptions={chooserOptionThemes}
-          chooserCreateTitle="Create a new theme"
-          isLoading={isLoadingThemes}
-          />
-        <FormTextInputHashtags
-          ref="inputTags"
-          nextFocus={this.refs.inputTopic}
-          title="Describe your theme by 1-2 tags"
-          onChangeHashtags={(tags => this.setState({tags}))}
-          onChangeValue={(tagsToString => this.setState({tagsToString}))}
-          inputProps={{
-            placeholder: "Use space to separate"
-          }}
-          />
-        <FormTextInput
-          title="Title of your sharing"
-          ref="inputTopic"
-          onPressInfo={this._onPressInfoTopic.bind(this)}
-          inputProps={{
-            placeholder,
-            value: topic,
-            onChangeText: this._onChangeTextTopic.bind(this),
-          }}
-          />
-        {/*<FormTextDescription
-          title="Time"
-          description={date}
-          onPressInfo={this._onPressInfoDate.bind(this)}
-          isLoading={isLoadingSchedule}
-          />*/}
-        <FormChooser
-          title="Date"
-          description="Choose a date"
-          onPressInfo={this._onPressInfoDate.bind(this)}
-          onSelectValue={this._onSelectValueDate.bind(this)}
-          chooser={chooser}
-          chooseTitle="Choose a date"
-          chooserOptions={chooserOptionDates}
-          isLoading={isLoadingSchedule}
-          />
-        <FormChooser
-          ref={f => this.formChooserPlace = f}
-          title="Place"
-          description="Choose a place"
-          onPressInfo={this._onPressInfoPlace.bind(this)}
-          onSelectValue={this._onSelectValuePlace.bind(this)}
-          onPressCreate={onPressCreatePlace}
-          chooser={chooser}
-          chooseTitle="Choose a place"
-          chooserOptions={chooserOptionPlaces}
-          chooserCreateTitle={createNewPlaceTitle}
-          isLoading={isLoadingPlaces}
-          />
-        {/*false && <Text>{name} | {phone} | {theme} | {topic} | {tags}</Text>*/}
-        <Button
-          onPress={this._onPressValidateCreateWap.bind(this)}
-          title="Create this WAP"
-          color={Colors.tintColor}
-          accessibilityLabel="Click here to create a WAP"
-          disabled={!isButtonEnabled}
-        />
-      </View>
-    )
-  }
-
-  render() {
-    this._refreshCommunity()
     return (
       <View style={styles.container}>
         <CreateValueModal
@@ -453,7 +323,91 @@ In this WAP, your sharing should be related to ${currentTheme}.`
           title={this.state.modalInfoTitle}
           description={this.state.modalInfoDescription}
           />
-        {this.getContainerFromPlatform(this.getContent())}
+        <KeyboardAwareScrollViewCompat>
+          <FormTextInput
+            title="Your name"
+            nextFocus={this.refs.inputPhone}
+            inputProps={{
+              placeholder,
+              value: name,
+              onChangeText: this._onChangeTextName.bind(this),
+            }}
+          />
+          <FormTextInput
+            ref="inputPhone"
+            nextFocus={this.refs.inputTags}
+            title="Your phone number"
+            inputProps={{
+              placeholder,
+              value: phone,
+              onChangeText: this._onChangeTextPhone.bind(this),
+              keyboardType: "phone-pad",
+            }}
+            />
+          <FormChooser
+            ref={f => this.formChooserTheme = f}
+            title="Theme"
+            description="Choose a theme"
+            onPressInfo={this._onPressInfoTheme.bind(this)}
+            onSelectValue={this._onSelectValueTheme.bind(this)}
+            onPressCreate={this._onPressCreateTheme.bind(this)}
+            chooser={chooser}
+            chooseTitle="Choose a WAP theme"
+            chooserOptions={chooserOptionThemes}
+            chooserCreateTitle="Create a new theme"
+            isLoading={isLoadingThemes}
+            />
+          <FormTextInputHashtags
+            ref="inputTags"
+            nextFocus={this.refs.inputTopic}
+            title="Describe your theme by 1-2 tags"
+            onChangeHashtags={(tags => this.setState({tags}))}
+            onChangeValue={(tagsToString => this.setState({tagsToString}))}
+            inputProps={{
+              placeholder: "Use space to separate"
+            }}
+            />
+          <FormTextInput
+            title="Title of your sharing"
+            ref="inputTopic"
+            onPressInfo={this._onPressInfoTopic.bind(this)}
+            inputProps={{
+              placeholder,
+              value: topic,
+              onChangeText: this._onChangeTextTopic.bind(this),
+            }}
+            />
+          <FormChooser
+            title="Date"
+            description="Choose a date"
+            onPressInfo={this._onPressInfoDate.bind(this)}
+            onSelectValue={this._onSelectValueDate.bind(this)}
+            chooser={chooser}
+            chooseTitle="Choose a date"
+            chooserOptions={chooserOptionDates}
+            isLoading={isLoadingSchedule}
+            />
+          <FormChooser
+            ref={f => this.formChooserPlace = f}
+            title="Place"
+            description="Choose a place"
+            onPressInfo={this._onPressInfoPlace.bind(this)}
+            onSelectValue={this._onSelectValuePlace.bind(this)}
+            onPressCreate={onPressCreatePlace}
+            chooser={chooser}
+            chooseTitle="Choose a place"
+            chooserOptions={chooserOptionPlaces}
+            chooserCreateTitle={createNewPlaceTitle}
+            isLoading={isLoadingPlaces}
+            />
+          <Button
+            onPress={this._onPressValidateCreateWap.bind(this)}
+            title="Create this WAP"
+            color={Colors.tintColor}
+            accessibilityLabel="Click here to create a WAP"
+            disabled={!isButtonEnabled}
+          />
+        </KeyboardAwareScrollViewCompat>
         <ChooserText ref={chooser => !this.state.chooser && this.setState({chooser})} />
       </View>
     );
