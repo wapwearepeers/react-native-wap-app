@@ -92,8 +92,6 @@ export default class AppContainer extends React.Component {
         <Provider store={Store}>
           <View style={styles.container}>
             {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-            {Platform.OS === 'android' &&
-              <View style={styles.statusBarUnderlay} />}
             {this.communityId && this.communityId > -1 ? (
               <RootNavigation />
             ) : (

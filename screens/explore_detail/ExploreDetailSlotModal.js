@@ -23,6 +23,7 @@ export class ExploreDetailSlotModal extends Component {
       modalVisible: false,
       name:'',
       topic:'',
+      canValidate: true,
     }
   }
 
@@ -31,12 +32,14 @@ export class ExploreDetailSlotModal extends Component {
   }
 
   _onPressValidate() {
-    this.props.onPressValidate(this.state.name, this.state.topic)
+    if (this.state.canValidate)
+      this.props.onPressValidate(this.state.name, this.state.topic)
+    this.setState({canValidate:false})
     this.setModalVisible(false)
   }
 
   _canValidate() {
-    const {name} = this.state
+    const {name, canValidate} = this.state
     return name && name != ''
   }
 
@@ -70,7 +73,7 @@ export class ExploreDetailSlotModal extends Component {
                   onSubmitEditing={(event) => { this.refs.descriptionInput.focus(); }}
                   autoCapitalize={'words'}
                 />
-                <TextInput
+                {false && <TextInput
                   ref={'descriptionInput'}
                   style={[Styles.textInput, {width:this.state.textInputWidth, marginTop:padding}]}
                   value={this.state.topic}
@@ -78,7 +81,7 @@ export class ExploreDetailSlotModal extends Component {
                   onChangeText={(topic) => this.setState({topic})}
                   onSubmitEditing={(event) => { this._onPressValidate() }}
                   autoCapitalize={'sentences'}
-                />
+                />}
               </View>
               <FontAwesome
                 style={styles.iconEdit}

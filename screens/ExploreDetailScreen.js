@@ -34,11 +34,11 @@ export default class ExploreDetailScreen extends React.Component {
     super(props)
     const {state} = this.props.navigation;
     const {wap} = state.params;
-    const {key, tags, theme, place, date, participants} = wap
+    const {key, tags, theme, place, topic, date, participants} = wap
     var description = tags ? tags.join(" ") : " "
     this.state = {
       modalVisible: false,
-      tags, theme, place, date, participants
+      tags, theme, place, date, topic, participants
     };
     this.editedParticipant = null
     this.editedParticipantIndex = -1
@@ -84,8 +84,8 @@ export default class ExploreDetailScreen extends React.Component {
       console.log("snap:"+JSON.stringify(snap))
       var wap = snap.val()
       if (wap) {
-        const {key, tags, theme, place, date, participants} = wap
-        this.setState({tags, theme, place, date, participants});
+        const {key, tags, theme, place, date, topic, participants} = wap
+        this.setState({tags, theme, place, date, topic, participants});
       }
     });
   }
@@ -143,7 +143,7 @@ export default class ExploreDetailScreen extends React.Component {
 
   render() {
     this._refreshCommunity()
-    const {tags, theme, date, place} = this.state
+    const {tags, theme, date, place, topic} = this.state
     var description = (tags ? tags.join(" ") : " ") + "\n"
     return (
       <ScrollView>
@@ -151,7 +151,7 @@ export default class ExploreDetailScreen extends React.Component {
           <ExploreDetailSlotModal ref={'modal'} onPressValidate={this._onPressValidate.bind(this)}/>
           <View style={styles.containerWithPadding}>
             <View style={styles.containerTitle}>
-              <AccentText fontSize={'mediumBig'} style={styles.textTitle}>{theme}</AccentText>
+              <AccentText fontSize={'mediumBig'} style={styles.textTitle}>{topic}</AccentText>
               <SoftText fontSize={'small'} style={styles.textDescription}>{description}</SoftText>
             </View>
             <AccentText fontSize={'medium'} style={styles.textTitle}>{date}</AccentText>

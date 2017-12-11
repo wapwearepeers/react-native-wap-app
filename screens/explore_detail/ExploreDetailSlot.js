@@ -26,7 +26,7 @@ export class ExploreDetailSlot extends Component {
         </View>
         <View style={styles.container}>
           <AccentText fontSize={'medium'} style={styles.textTitle}>{name}</AccentText>
-          <SoftText fontSize={'small'} style={styles.textDescription}>{topic}</SoftText>
+          <SoftText fontSize={'small'} style={styles.textDescription}>{isOrganizer ? 'WAP Creator' : 'Attending'}</SoftText>
         </View>
         <FontAwesome
           style={styles.iconPhone}

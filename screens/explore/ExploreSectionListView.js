@@ -20,7 +20,7 @@ export class ExploreSectionListView extends Component {
     var description = tags ? tags.join(" ") : " "
     return (
         <TouchableOpacity onPress={this.props.onPressRow.bind(this, row)}>
-          <ExploreRow title={row.theme} description={description} participantCount={row.participants.length} joined={row.joined}  />
+          <ExploreRow title={row.topic} description={description} participantCount={row.participants.length} joined={row.joined}  />
         </TouchableOpacity>
     )
   }

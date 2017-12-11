@@ -284,7 +284,8 @@ export default class CreateScreen extends React.Component {
       this.placesRef.set(this.state.chooserOptionPlaces)
 
     var newWapRef = this.wapsRef.push()
-    const {name, phone, theme, tags, topic, place} = this.state
+    var {name, phone, theme, tags, topic, place} = this.state
+    if (!theme) theme = ''
     newWapRef.set({
       theme,
       tags,
@@ -302,7 +303,7 @@ export default class CreateScreen extends React.Component {
     const placeholder = 'Type here'
     const {name, phone, theme, tags, topic, place, date, isLoadingThemes, isLoadingPlaces, isLoadingSchedule, chooser, chooserOptionThemes, chooserOptionPlaces, chooserOptionDates} = this.state
     const {canAddPlaces} = this.props
-    var isButtonEnabled = name && phone && theme && tags && place && date && this.wapDate
+    var isButtonEnabled = name && phone && tags && place && date && this.wapDate
 
     var onPressCreatePlace
     var createNewPlaceTitle
@@ -339,7 +340,7 @@ export default class CreateScreen extends React.Component {
           />
           <FormTextInput
             ref="inputPhone"
-            nextFocus={this.refs.inputTags}
+            nextFocus={this.refs.inputTopic}
             title="Your phone number"
             inputProps={{
               placeholder,
@@ -348,7 +349,18 @@ export default class CreateScreen extends React.Component {
               keyboardType: "phone-pad",
             }}
             />
-          <FormChooser
+          <FormTextInput
+            title="Title of your sharing"
+            ref="inputTopic"
+            nextFocus={this.refs.inputTags}
+            onPressInfo={this._onPressInfoTopic.bind(this)}
+            inputProps={{
+              placeholder,
+              value: topic,
+              onChangeText: this._onChangeTextTopic.bind(this),
+            }}
+            />
+          {false && <FormChooser
             ref={f => this.formChooserTheme = f}
             title="Theme"
             description="Choose a theme"
@@ -360,25 +372,14 @@ export default class CreateScreen extends React.Component {
             chooserOptions={chooserOptionThemes}
             chooserCreateTitle="Create a new theme"
             isLoading={isLoadingThemes}
-            />
+            />}
           <FormTextInputHashtags
             ref="inputTags"
-            nextFocus={this.refs.inputTopic}
-            title="Describe your theme by 1-2 tags"
+            title="Describe your wap by 1-2 tags"
             onChangeHashtags={(tags => this.setState({tags}))}
             onChangeValue={(tagsToString => this.setState({tagsToString}))}
             inputProps={{
               placeholder: "Use space to separate"
-            }}
-            />
-          <FormTextInput
-            title="Title of your sharing"
-            ref="inputTopic"
-            onPressInfo={this._onPressInfoTopic.bind(this)}
-            inputProps={{
-              placeholder,
-              value: topic,
-              onChangeText: this._onChangeTextTopic.bind(this),
             }}
             />
           <FormChooser

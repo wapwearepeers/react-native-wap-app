@@ -21,7 +21,7 @@ export class ExploreDetailSlotEmpty extends Component {
         <View style={styles.image} />
         <View style={styles.container}>
           <SoftText fontSize={'medium'} style={styles.textTitle}>Free spot</SoftText>
-          <SoftText fontSize={'small'} style={styles.textDescription}>Join to share about {this.props.theme}</SoftText>
+          <SoftText fontSize={'small'} style={styles.textDescription}>Join this wap</SoftText>
         </View>
         <FontAwesome
           style={styles.iconEdit}
